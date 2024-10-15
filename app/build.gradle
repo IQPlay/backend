@@ -7,7 +7,7 @@
 
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
-    application
+    id 'application'
 }
 
 repositories {
@@ -17,10 +17,12 @@ repositories {
 
 dependencies {
     // Use JUnit test framework.
-    testImplementation(libs.junit)
+    testImplementation libs.junit
 
-    // This dependency is used by the application.
-    implementation(libs.guava)
+    //AJOUT DE CES DEPENDANCES
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.3.3'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.3.3'
+    
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -30,7 +32,13 @@ java {
     }
 }
 
+//NOUS AVONS AJOUTE CE CODE
+group = "fr.parisNanterre.DigiMenu-Orga" // defini le nom du package
+//artefact c'est le meme nom que le nom du projet
+version = "0.0.1"
+
 application {
     // Define the main class for the application.
-    mainClass = "org.example.App"
+    mainClass = 'fr.parisNanterre.DigiMenuOrga.App' //on renomme le nom du package
+    
 }
