@@ -39,6 +39,6 @@ version = "0.0.1"
 
 application {
     // Define the main class for the application.
-    mainClass = 'fr.parisNanterre.DigiMenuOrga.App' //on renomme le nom du package
+    mainClass = 'fr.parisNanterre.FideliTech.App' //on renomme le nom du package
     
 }

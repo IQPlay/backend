@@ -1,4 +1,4 @@
-package fr.parisNanterre.DigiMenuOrga.controllers;
+package fr.parisNanterre.FideliTech.controllers;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
