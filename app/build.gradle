@@ -8,6 +8,20 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
+    id 'jacoco' //pour les tests coverage
+}
+jacoco{
+    toolVersion = "0.8.12" // jacoco version, denpendance de compilation
+}
+test{
+    useJUnitPlatform() //pour les tests
+    finalizedBy jacocoTestReport //pour les tests coverage
+}
+jacocoTestReport{
+    reports{
+        xml.required.set(true) //pour les tests coverage
+        html.required.set(true) //pour les tests coverage
+    }
 }
 
 repositories {
