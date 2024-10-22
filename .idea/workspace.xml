@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="230d42dd-8f55-4c62-a2f3-da423747aedc" name="Changes" comment="" />
+    <list default="true" id="230d42dd-8f55-4c62-a2f3-da423747aedc" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/fr/parisNanterre/FideliTech/controllers/CalculMentalController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -14,6 +18,13 @@
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
     </projectState>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -32,7 +43,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "initbackend",
+    "git-widget-placeholder": "develop",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/samibahij/Documents/Ecole/MIAGE/Master/projet/devops/backend",
     "node.js.detected.package.eslint": "true",
@@ -47,7 +58,7 @@
   <component name="RunManager">
     <configuration name="App" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="back.app.main" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="fr.parisNanterre.DigiMenuOrga.App" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="fr.parisNanterre.FideliTech.App" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -71,6 +82,7 @@
       <updated>1729007242914</updated>
       <workItem from="1729007244717" duration="2865000" />
       <workItem from="1729580145429" duration="2586000" />
+      <workItem from="1729586732642" duration="2175000" />
     </task>
     <servers />
   </component>
