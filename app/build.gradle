@@ -8,6 +8,29 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
+    id 'jacoco' //pour les tests coverage
+    id "org.sonarqube" version "5.1.0.4882"
+}
+jacoco{
+    toolVersion = "0.8.12" // jacoco version, denpendance de compilation
+}
+test{
+    useJUnitPlatform() //pour les tests
+    finalizedBy jacocoTestReport //pour les tests coverage
+}
+jacocoTestReport{
+    reports{
+        xml.required.set(true) //pour les tests coverage
+        html.required.set(true) //pour les tests coverage
+    }
+}
+
+sonar {
+  properties {
+    property "sonar.projectKey", "IQPlay_backend"
+    property "sonar.organization", "iqplay"
+    property "sonar.host.url", "https://sonarcloud.io"
+  }
 }
 
 repositories {
