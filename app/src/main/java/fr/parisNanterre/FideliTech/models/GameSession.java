@@ -4,25 +4,25 @@ import java.util.List;
 
 public class GameSession {
     // Attributs
-    private GameCalculMental.GameMode gameMode; // Mode de jeu choisi pour cette session
+    private String SessionID;
     private double successTargetRate; // Taux de réussite attendu pour le jeu
     private int difficultyLevel; // Niveau de difficulté pour cette session
     private List<Operation> currentOperations; // Liste des opérations de la dernière séquence
     private List<Response> currentResponses; // Liste des réponses de la dernière séquence
 
     // Constructeur
-    public GameSession(GameCalculMental.GameMode gameMode, double successTargetRate, int initialDifficultyLevel) {
-        this.gameMode = gameMode;
+    public GameSession(String SessionID, double successTargetRate, int initialDifficultyLevel) {
+        this.SessionID=SessionID;
         this.successTargetRate = successTargetRate;
         this.difficultyLevel = initialDifficultyLevel;
         this.currentOperations = null; // Initialisation à null, la séquence sera créée plus tard
+        this.currentResponses = null;
     }
 
     // Getters
-    public GameCalculMental.GameMode getGameMode() {
-        return gameMode;
+    public String getSessionID() {
+        return SessionID;
     }
-
     public double getSuccessTargetRate() {
         return successTargetRate;
     }
@@ -39,10 +39,10 @@ public class GameSession {
     }
 
     // Méthode pour mettre à jour
-    public void updateCurrentOperations(List<Operation> operations) {
+    public void setCurrentOperations(List<Operation> operations) {
         this.currentOperations = operations;
     }
-    public void updateCurrentResponses(List<Response> responses){
+    public void setCurrentResponses(List<Response> responses){
         this.currentResponses = responses;
 
     }
