@@ -1,6 +1,9 @@
 # Backend
 
 This is the backend for **IQPlay**, a web project focused on memory training. It provides the necessary server-side logic and data management for the game’s functionalities.
+Voici une version mise à jour avec le lien vers le frontend :
+
+To access the frontend repository, visit: [IQPlay Frontend](https://github.com/IQPlay/frontend)
 
 
 
