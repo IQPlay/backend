@@ -1,7 +1,7 @@
-package fr.parisNanterre.FideliTech;
+package fr.parisNanterre.iqPlay;
 
-import fr.parisNanterre.FideliTech.models.Operation;
-import fr.parisNanterre.FideliTech.services.OperationService;
+import fr.parisNanterre.iqPlay.models.Operation;
+import fr.parisNanterre.iqPlay.services.OperationService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

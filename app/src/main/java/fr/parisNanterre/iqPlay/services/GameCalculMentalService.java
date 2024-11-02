@@ -1,6 +1,6 @@
-package fr.parisNanterre.FideliTech.services;
+package fr.parisNanterre.iqPlay.services;
 
-import fr.parisNanterre.FideliTech.models.GameSession;
+import fr.parisNanterre.iqPlay.models.GameSession;
 
 
 public class GameCalculMentalService {

@@ -1,4 +1,4 @@
-package fr.parisNanterre.FideliTech.models;
+package fr.parisNanterre.iqPlay.models;
 
 import java.util.List;
 

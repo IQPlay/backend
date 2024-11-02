@@ -1,7 +1,7 @@
-package fr.parisNanterre.FideliTech.services;
+package fr.parisNanterre.iqPlay.services;
 
-import fr.parisNanterre.FideliTech.models.Operation;
-import fr.parisNanterre.FideliTech.models.Response;
+import fr.parisNanterre.iqPlay.models.Operation;
+import fr.parisNanterre.iqPlay.models.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
