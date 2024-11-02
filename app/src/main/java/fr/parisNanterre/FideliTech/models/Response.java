@@ -4,12 +4,12 @@ public class Response {
 
     // Attributs
     private int givenAnswer; // Réponse fournie par l'utilisateur
-    private long responseTime; // Temps pris pour répondre en millisecondes
+    // private long responseTime; // Temps pris pour répondre en millisecondes
 
     // Constructeur
     public Response(int givenAnswer, long responseTime) {
         this.givenAnswer = givenAnswer;
-        this.responseTime = responseTime;
+    //    this.responseTime = responseTime;
     }
 
     // Getters
@@ -17,7 +17,8 @@ public class Response {
         return givenAnswer;
     }
 
-    public long getResponseTime() {
+   /*public long getResponseTime() {
         return responseTime;
     }
+    */
 }

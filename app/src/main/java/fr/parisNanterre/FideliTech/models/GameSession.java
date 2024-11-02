@@ -39,6 +39,10 @@ public class GameSession {
     }
 
     // Méthode pour mettre à jour
+    public void setDifficultyLevel(int difficultyLevel) {
+        this.difficultyLevel = difficultyLevel;
+    }
+
     public void setCurrentOperations(List<Operation> operations) {
         this.currentOperations = operations;
     }
