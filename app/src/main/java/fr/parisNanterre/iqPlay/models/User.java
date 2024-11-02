@@ -1,5 +1,7 @@
 package fr.parisNanterre.iqPlay.models;
 
-public class User {
+import fr.parisNanterre.iqPlay.models.interfaces.IUser;
+
+public class User implements IUser {
     
 }

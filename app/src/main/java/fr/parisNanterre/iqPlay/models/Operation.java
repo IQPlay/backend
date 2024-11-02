@@ -1,6 +1,8 @@
 package fr.parisNanterre.iqPlay.models;
 
-public class Operation {
+import fr.parisNanterre.iqPlay.models.interfaces.IOperation;
+
+public class Operation implements IOperation {
 
     // Attributs
     private String expression; // Représentation de l'opération (par exemple "2 + 3")

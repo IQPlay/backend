@@ -9,11 +9,11 @@ import java.util.Random;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OperationService {
+public class OperationService implements IOperationService {
 
     private Random random = new Random();
 
-    // Méthode pour obtenir une liste d'opérateurs
+    @Override
     public List<Character> obtainsOperand(int nbOperateur) {
         List<Character> operators = Arrays.asList('*', '/', '-', '+');
         List<Character> operandList = new ArrayList<>();
@@ -39,7 +39,7 @@ public class OperationService {
         return operandList;
     }
 
-    // Méthode pour créer une opération
+    @Override
     public Operation createOperation(int difficulty) {
         // Obtenir les opérateurs
         List<Character> operands = obtainsOperand(difficulty % 3 + 2);
@@ -100,7 +100,7 @@ public class OperationService {
         return new Operation(expression, result);
     }
 
-    // Méthode pour générer un nombre aléatoire avec un nombre spécifique de chiffres
+    @Override
     public int generateRandomNumberWithDigits(int numDigits) {
         // Vérifie que le nombre de chiffres est positif
         if (numDigits <= 0) {
@@ -114,8 +114,8 @@ public class OperationService {
         // Utilise random.nextInt pour générer un nombre aléatoire entre min et max
         return random.nextInt(max - min + 1) + min; // Ceci garantit que le résultat ne sera jamais 0
     }
-    
 
+    @Override
     public List<Operation> createSequence3Operation(int difficulty){
         List<Operation> operations = new ArrayList<>();
         Operation o1 = createOperation(difficulty-1);
@@ -126,20 +126,14 @@ public class OperationService {
         operations.add(o3);
 
         return operations;
-
     }
 
-    // Méthode pour comparer une réponse avec le résultat d'une opération
+    @Override
     public boolean isCorrectResponse(Response response, Operation operation) {
-        return response.getGivenAnswer() == operation.getResult();
+        return response.givenAnswer() == operation.getResult();
     }
 
-    /**
-     * Méthode pour calculer le ratio de bonnes réponses
-     * @param responses Liste des réponses fournies par l'utilisateur
-     * @param operations Liste des opérations à comparer
-     * @return Ratio de bonnes réponses (entre 0 et 1)
-     */
+    @Override
     public double calculateCorrectAnswerRatio(List<Response> responses, List<Operation> operations) {
         if (responses.size() != operations.size()) {
             throw new IllegalArgumentException("Les listes de réponses et d'opérations doivent avoir la même taille.");
@@ -155,6 +149,5 @@ public class OperationService {
         // Calcul du ratio de bonnes réponses
         return (double) correctAnswers / responses.size();
     }
-
 
 }

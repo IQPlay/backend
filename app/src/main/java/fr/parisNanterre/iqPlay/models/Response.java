@@ -1,6 +1,8 @@
 package fr.parisNanterre.iqPlay.models;
 
-public class Response {
+import fr.parisNanterre.iqPlay.models.interfaces.IResponse;
+
+public class Response implements IResponse {
 
     // Attributs
     private int givenAnswer; // Réponse fournie par l'utilisateur
@@ -12,8 +14,8 @@ public class Response {
     //    this.responseTime = responseTime;
     }
 
-    // Getters
-    public int getGivenAnswer() {
+    @Override
+    public int givenAnswer() {
         return givenAnswer;
     }
 

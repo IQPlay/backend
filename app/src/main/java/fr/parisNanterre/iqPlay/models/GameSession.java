@@ -46,9 +46,9 @@ public class GameSession {
     public void setCurrentOperations(List<Operation> operations) {
         this.currentOperations = operations;
     }
+
     public void setCurrentResponses(List<Response> responses){
         this.currentResponses = responses;
-
     }
     
 }
