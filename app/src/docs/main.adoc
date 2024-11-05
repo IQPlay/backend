@@ -1,0 +1,16 @@
+= Backend
+
+:plantuml:
+ifndef::modelsdir[:modeldir: models]
+
+== Team
+- Mathieu Baleydier
+- Sami Letellier
+- Changkai Wang
+
+== Objectif de l'application
+
+adda
+
+== Architecture
+plantuml::src/docs/model/archi.puml[format=svg]

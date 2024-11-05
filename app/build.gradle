@@ -10,7 +10,34 @@ plugins {
     id 'application'
     id 'jacoco' //pour les tests coverage
     id "org.sonarqube" version "5.1.0.4882"
+    id 'org.asciidoctor.jvm.convert' version '4.0.2'
+    id 'org.asciidoctor.jvm.pdf' version '4.0.2'
 }
+asciidoctor {
+    sourceDir = file('src/docs')
+    outputDir = file("${buildDir}/docs")
+}
+
+asciidoctorj {
+    requires 'rouge'
+    modules {
+        diagram.use()
+        diagram.version '1.5.16'
+    }
+    attributes 'build-gradle': file('build.gradle'),
+        'sourcedir': project.sourceSets.main.java.srcDirs[0],
+        'source-highlighter': 'rouge',
+        'rouge-style': 'github',
+        'rouge-theme': 'github'
+        
+}
+
+asciidoctorPdf {
+    sourceDir = file('src/docs')
+    outputDir = file("${buildDir}/docs")
+}
+
+
 jacoco{
     toolVersion = "0.8.12" // jacoco version, denpendance de compilation
 }
@@ -64,4 +91,13 @@ application {
     // Define the main class for the application.
     mainClass = 'fr.parisNanterre.FideliTech.App' //on renomme le nom du package
     
+    
+}
+
+// edit the build task to generate the asciidoc pdf too
+tasks.named('asciidoctor').configure {
+    dependsOn tasks.named('asciidoctorPdf')
+}
+tasks.named('build').configure {
+    dependsOn tasks.named('asciidoctor')
 }
