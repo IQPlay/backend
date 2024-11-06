@@ -86,7 +86,7 @@ java {
 //NOUS AVONS AJOUTE CE CODE
 group = "fr.parisNanterre.DigiMenu-Orga" // defini le nom du package
 //artefact c'est le meme nom que le nom du projet
-version = "0.0.1"
+version = "0.2.0"
 
 application {
     // Define the main class for the application.

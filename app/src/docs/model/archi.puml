@@ -1,43 +1,117 @@
-@startuml
+"@startuml  IQPLAY"
 
-package fr.parisnanterre {
-    class App {
-        + main(String[] args)
+package fr.parisNanterre.iqPlay.models {
+
+    class GameCalculMental {
+        - static final double DEFAULT_SUCCESS_TARGET_RATE
+        - double successTargetRate
+        + GameCalculMental()
+        + getSuccessTargetRate() : double
     }
 
-    package controllers {
-        class HelloController {
-            + getHello() : String
-        }
+    class GameSession {
+        - String sessionID
+        - double successTargetRate
+        - int difficultyLevel
+        - List<Operation> currentOperations
+        - List<Response> currentResponses
+        + GameSession(String sessionID, GameCalculMental game, int initialDifficultyLevel)
+        + getSessionID() : String
+        + getSuccessTargetRate() : double
+        + getDifficultyLevel() : int
+        + getCurrentOperations() : List<Operation>
+        + getCurrentResponses() : List<Response>
+        + setDifficultyLevel(int)
+        + setCurrentOperations(List<Operation>)
+        + setCurrentResponses(List<Response>)
     }
 
-    package models {
-            class HelloModel {
-                + sayHello() : String
-            }
-        }
-    ' Relationships
-    App --> HelloController : "creates"
-    HelloController --> HelloModel
+    class Operation {
+        - String expression
+        - int result
+        + Operation(String expression, int result)
+        + getExpression() : String
+        + getResult() : int
+    }
+
+    class Response {
+        - int givenAnswer
+        - boolean isCorrect
+        + Response(int givenAnswer, boolean isCorrect)
+        + givenAnswer() : int
+        + isCorrect() : boolean
+    }
+
+    class User {
+        // Class is empty for now, but implements IUser
+    }
+
 }
 
-' Adding Spring Boot dependencies to highlight Spring context
-package org.springframework {
-    interface SpringApplication
-    interface RestController
-    interface GetMapping
+package fr.parisNanterre.iqPlay.services {
 
-    App --> SpringApplication : "run()"
-    HelloController --> RestController
-    HelloController --> GetMapping
+    class Evaluator {
+        + static int evaluate(String expression) : int
+    }
+
+    class GameCalculMentalService {
+        - final GameCalculMental game
+        - final Map<String, GameSession> sessions
+        - static final int DEFAULT_INITIAL_DIFFICULTY_LEVEL
+        + GameCalculMentalService()
+        + newSession(int initialDifficultyLevel) : GameSession
+        + newSession() : GameSession
+        + getSessionById(String sessionId) : GameSession
+        + removeSession(String sessionId)
+        + updateDifficultyLevel(double successRate, GameSession gameSession)
+    }
+
+    class OperationService {
+        - Random random
+        - static final int DEFAULT_SEQUENCE_SIZE
+        + obtainsOperand(int nbOperateur) : List<Character>
+        + createOperation(int difficulty) : Operation
+        + generateRandomNumberWithDigits(int numDigits) : int
+        + createSequenceNOperation(int difficulty) : List<Operation>
+        + createResponse(int givenAnswer, Operation operation) : Response
+        + isCorrectResponse(Response reponse) : boolean
+        + calculateCorrectAnswerRatio(List<Response> responses) : double
+    }
+
 }
 
-package io.swagger.v3.oas.annotations{
-    interface Operation
-    interface Tag
+package fr.parisNanterre.iqPlay.controllers {
 
-    HelloController --> Operation
-    HelloController --> Tag
+    class GameCalculMentalController {
+        - GameCalculMentalService gameCalculMentalService
+        - OperationService operationService
+        + startGame(int difficulty) : ResponseEntity<?>
+        + getNextOperation(String sessionId) : ResponseEntity<Operation>
+        + submitAnswer(String sessionId, int userAnswer) : ResponseEntity<?>
+        + stopGame(String sessionId) : ResponseEntity<String>
+        + continueGame(String sessionId) : ResponseEntity<String>
+    }
+
 }
+
+' Relationships
+GameSession --> GameCalculMental : "uses"
+GameSession --> Operation : "contains"
+GameSession --> Response : "contains"
+Operation --> "interfaces" : IOperation
+Response --> "interfaces" : IResponse
+User --> "interfaces" : IUser
+
+GameCalculMentalService --> GameCalculMental : "uses"
+GameCalculMentalService --> GameSession : "creates"
+GameCalculMentalService --> Operation : "relies on"
+GameCalculMentalService --> Response : "relies on"
+
+OperationService --> Operation : "creates"
+OperationService --> Response : "creates"
+OperationService --> Evaluator : "uses"
+
+GameCalculMentalController --> GameCalculMentalService : "uses"
+GameCalculMentalController --> OperationService : "uses"
 
 @enduml
