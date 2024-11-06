@@ -3,15 +3,14 @@ package fr.parisNanterre.iqPlay.models;
 import fr.parisNanterre.iqPlay.models.interfaces.IResponse;
 
 public class Response implements IResponse {
-
     // Attributs
     private int givenAnswer; // Réponse fournie par l'utilisateur
-    // private long responseTime; // Temps pris pour répondre en millisecondes
+    private boolean isCorrect; // Indique si la réponse est correcte
 
     // Constructeur
-    public Response(int givenAnswer, long responseTime) {
+    public Response(int givenAnswer, boolean isCorrect) {
         this.givenAnswer = givenAnswer;
-    //    this.responseTime = responseTime;
+        this.isCorrect = isCorrect;
     }
 
     @Override
@@ -19,8 +18,7 @@ public class Response implements IResponse {
         return givenAnswer;
     }
 
-   /*public long getResponseTime() {
-        return responseTime;
+    public boolean isCorrect() {
+        return isCorrect;
     }
-    */
 }

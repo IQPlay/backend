@@ -16,10 +16,10 @@ public interface IOperationService {
     // Méthode pour générer un nombre aléatoire avec un nombre spécifique de chiffres
     int generateRandomNumberWithDigits(int numDigits);
 
-    List<Operation> createSequence3Operation(int difficulty);
+    List<Operation> createSequenceNOperation(int difficulty);
 
-    // Méthode pour comparer une réponse avec le résultat d'une opération
-    boolean isCorrectResponse(Response response, Operation operation);
+    // Méthode pour savoir si une réponse est correcte
+    boolean isCorrectResponse(Response response);
 
     /**
      * Méthode pour calculer le ratio de bonnes réponses
@@ -27,5 +27,7 @@ public interface IOperationService {
      * @param operations Liste des opérations à comparer
      * @return Ratio de bonnes réponses (entre 0 et 1)
      */
-    double calculateCorrectAnswerRatio(List<Response> responses, List<Operation> operations);
+
+     // Méthode pour calculer le % de bonne réponse
+    double calculateCorrectAnswerRatio(List<Response> responses);
 }

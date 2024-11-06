@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 public class OperationService implements IOperationService {
 
     private Random random = new Random();
+    private static final int DEFAULT_SEQUENCE_SIZE = 3;
 
     @Override
     public List<Character> obtainsOperand(int nbOperateur) {
@@ -39,14 +40,15 @@ public class OperationService implements IOperationService {
         return operandList;
     }
 
+
     @Override
     public Operation createOperation(int difficulty) {
         // Obtenir les opérateurs
         List<Character> operands = obtainsOperand(difficulty % 3 + 2);
 
         // Calculer les nombres de chiffres requis pour chaque nombre
-        int[] digits = new int[4];
-        for (int i = 0; i < 4; i++) {
+        int[] digits = new int[operands.size() + 1];
+        for (int i = 0; i < digits.length; i++) {
             digits[i] = 1 + difficulty / 15;
             if (difficulty % 15 >= 3 + 3 * i) {
                 digits[i] += 1;
@@ -61,44 +63,29 @@ public class OperationService implements IOperationService {
             numbers.add(number);
         }
 
-        // Construire l'expression et calculer le résultat
+        // Construire l'expression sous forme de chaîne
         StringBuilder expressionBuilder = new StringBuilder();
-        int result = numbers.get(0);
-        expressionBuilder.append(result);
+        expressionBuilder.append(numbers.get(0));  // Commencer avec le premier nombre
 
+        // Ajouter les opérateurs et les nombres dans l'expression
         for (int i = 0; i < operands.size(); i++) {
-            char operand = operands.get(i);
-            int nextNumber = numbers.get(i + 1);
-
-            expressionBuilder.append(" ").append(operand).append(" ").append(nextNumber);
-
-            // Calculer le résultat en fonction de l'opérateur
-            switch (operand) {
-                case '+':
-                    result += nextNumber;
-                    break;
-                case '-':
-                    result -= nextNumber;
-                    break;
-                case '*':
-                    result *= nextNumber;
-                    break;
-                case '/':
-                    if (nextNumber != 0) {
-                        result /= nextNumber;
-                    } else {
-                        result = 0; // Gérer la division par zéro
-                    }
-                    break;
-                default:
-                    throw new IllegalArgumentException("Opérateur non supporté : " + operand);
-            }
+            expressionBuilder.append(" ").append(operands.get(i))
+                              .append(" ").append(numbers.get(i + 1));
         }
 
-        // Créer l'objet Operation avec l'expression et le résultat calculé
+        // Récupérer l'expression sous forme de chaîne
         String expression = expressionBuilder.toString();
+
+        // Évaluer l'expression
+        int result = Evaluator.evaluate(expression);
+
+        // Créer l'objet Operation avec l'expression et le résultat
         return new Operation(expression, result);
     }
+
+    
+    
+    
 
     @Override
     public int generateRandomNumberWithDigits(int numDigits) {
@@ -116,38 +103,40 @@ public class OperationService implements IOperationService {
     }
 
     @Override
-    public List<Operation> createSequence3Operation(int difficulty){
+    public List<Operation> createSequenceNOperation(int difficulty ) {
         List<Operation> operations = new ArrayList<>();
-        Operation o1 = createOperation(difficulty-1);
-        Operation o2 = createOperation(difficulty);
-        Operation o3 = createOperation(difficulty+1);
-        operations.add(o1);
-        operations.add(o2);
-        operations.add(o3);
-
+    
+        // Calculer la difficulté de chaque opération pour qu'elles soient autour de la difficulté médiane
+        for (int i = 0; i < DEFAULT_SEQUENCE_SIZE ; i++) {
+            int currentDifficulty = difficulty + (i - DEFAULT_SEQUENCE_SIZE / 2); // Crée des difficultés autour de 'difficulty'
+            Operation operation = createOperation(currentDifficulty);
+            operations.add(operation);
+        }
+    
         return operations;
     }
 
-    @Override
-    public boolean isCorrectResponse(Response response, Operation operation) {
-        return response.givenAnswer() == operation.getResult();
+    public Response createResponse(int givenAnswer, Operation operation) {
+        boolean isCorrect = (givenAnswer == operation.getResult());
+        return new Response(givenAnswer, isCorrect);
+    }
+
+    public boolean isCorrectResponse(Response reponse){
+        return reponse.isCorrect();
     }
 
     @Override
-    public double calculateCorrectAnswerRatio(List<Response> responses, List<Operation> operations) {
-        if (responses.size() != operations.size()) {
-            throw new IllegalArgumentException("Les listes de réponses et d'opérations doivent avoir la même taille.");
-        }
-
+    public double calculateCorrectAnswerRatio(List<Response> responses) {
         int correctAnswers = 0;
-        for (int i = 0; i < responses.size(); i++) {
-            if (isCorrectResponse(responses.get(i), operations.get(i))) {
+        for (Response response : responses) {
+            if (response.isCorrect()) {
                 correctAnswers++;
             }
         }
-
+    
         // Calcul du ratio de bonnes réponses
         return (double) correctAnswers / responses.size();
     }
+    
 
 }

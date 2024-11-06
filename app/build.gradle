@@ -45,6 +45,7 @@ dependencies {
     //AJOUT DE CES DEPENDANCES
     implementation 'org.springframework.boot:spring-boot-starter-web:3.3.3'
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.3.3'
+    implementation 'org.apache.commons:commons-jexl3:3.2'
     
 }
 
@@ -64,4 +65,8 @@ application {
     // Define the main class for the application.
     mainClass = 'fr.parisNanterre.iqPlay.App' //on renomme le nom du package
     
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs += ['-parameters']
 }

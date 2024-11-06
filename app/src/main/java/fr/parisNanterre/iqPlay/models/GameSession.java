@@ -11,9 +11,9 @@ public class GameSession {
     private List<Response> currentResponses; // Liste des réponses de la dernière séquence
 
     // Constructeur
-    public GameSession(String SessionID, double successTargetRate, int initialDifficultyLevel) {
+    public GameSession(String SessionID, GameCalculMental game, int initialDifficultyLevel) {
         this.SessionID=SessionID;
-        this.successTargetRate = successTargetRate;
+        this.successTargetRate = game.getSuccessTargetRate();
         this.difficultyLevel = initialDifficultyLevel;
         this.currentOperations = null; // Initialisation à null, la séquence sera créée plus tard
         this.currentResponses = null;
