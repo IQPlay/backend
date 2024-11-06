@@ -72,6 +72,7 @@ dependencies {
     //AJOUT DE CES DEPENDANCES
     implementation 'org.springframework.boot:spring-boot-starter-web:3.3.3'
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.3.3'
+    implementation 'org.apache.commons:commons-jexl3:3.2'
     
 }
 
@@ -85,11 +86,11 @@ java {
 //NOUS AVONS AJOUTE CE CODE
 group = "fr.parisNanterre.DigiMenu-Orga" // defini le nom du package
 //artefact c'est le meme nom que le nom du projet
-version = "0.0.1"
+version = "0.2.0"
 
 application {
     // Define the main class for the application.
-    mainClass = 'fr.parisNanterre.FideliTech.App' //on renomme le nom du package
+    mainClass = 'fr.parisNanterre.iqPlay.App' //on renomme le nom du package
     
     
 }
@@ -100,4 +101,8 @@ tasks.named('asciidoctor').configure {
 }
 tasks.named('build').configure {
     dependsOn tasks.named('asciidoctor')
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs += ['-parameters']
 }
