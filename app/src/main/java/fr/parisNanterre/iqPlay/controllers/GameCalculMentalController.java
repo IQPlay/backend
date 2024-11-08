@@ -5,6 +5,7 @@ import fr.parisNanterre.iqPlay.models.Operation;
 import fr.parisNanterre.iqPlay.models.Response;
 import fr.parisNanterre.iqPlay.services.GameCalculMentalService;
 import fr.parisNanterre.iqPlay.services.OperationService;
+import io.sentry.Sentry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,14 +28,15 @@ public class GameCalculMentalController {
     @PostMapping("/start")
     public ResponseEntity<?> startGame(@RequestParam int difficulty) {
         // Créer une nouvelle session avec le niveau de difficulté donné
-        GameSession session = gameCalculMentalService.newSession(difficulty); 
-        
-        if (session == null) {
+        GameSession session = gameCalculMentalService.newSession(difficulty);
+
+        if (difficulty == 0) {
+            throw new NullPointerException("erreur pointeur");
             // Si la session n'a pas pu être créée, renvoyer une erreur avec un message structuré
-            return ResponseEntity.status(500).body(Map.of(
-                "message", "Erreur lors de la création de la session",
-                "sessionId", null
-            ));
+//            return ResponseEntity.status(500).body(Map.of(
+//                "message", "Erreur lors de la création de la session",
+//                "sessionId", null
+//            ));
         }
         
         // Générer la séquence d'opérations pour cette session
