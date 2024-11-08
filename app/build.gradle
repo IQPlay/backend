@@ -12,7 +12,6 @@ plugins {
     id "org.sonarqube" version "5.1.0.4882"
     id 'org.asciidoctor.jvm.convert' version '4.0.2'
     id 'org.asciidoctor.jvm.pdf' version '4.0.2'
-    id "io.sentry.jvm.gradle" version "4.13.0"
 }
 asciidoctor {
     sourceDir = file('src/docs')
@@ -61,31 +60,26 @@ sonar {
   }
 }
 
-sentry {
-    // Generates a JVM (Java, Kotlin, etc.) source bundle and uploads your source code to Sentry.
-    // This enables source context, allowing you to see your source
-    // code as part of your stack traces in Sentry.
-    includeSourceContext = true
-
-    org = "sami-gb"
-    projectName = "java"
-    authToken = System.getenv("SENTRY_AUTH_TOKEN")
-}
-
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+    maven {
+        url = uri("https://maven.pkg.github.com/IQPlay/library/")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+            password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+        }
+    }
 }
 
 dependencies {
     // Use JUnit test framework.
     testImplementation libs.junit
 
-    //AJOUT DE CES DEPENDANCES
     implementation 'org.springframework.boot:spring-boot-starter-web:3.3.3'
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.3.3'
     implementation 'org.apache.commons:commons-jexl3:3.2'
-    
+    implementation 'fr.parisnanterre:iqplaylib:0.2'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
