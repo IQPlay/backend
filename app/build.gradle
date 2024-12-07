@@ -96,7 +96,7 @@ group = "fr.parisNanterre"
 version = "0.2"
 
 application {
-    mainClass = 'fr.parisNanterre.iqPlay.App'
+    mainClass = 'fr.parisnanterre.iqplay.App'
 }
 
 tasks.named('asciidoctor').configure {

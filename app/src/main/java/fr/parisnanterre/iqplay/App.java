@@ -1,4 +1,5 @@
-package fr.parisNanterre.iqPlay;
+package fr.parisnanterre.iqplay;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
