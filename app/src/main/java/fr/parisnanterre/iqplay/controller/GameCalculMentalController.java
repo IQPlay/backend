@@ -1,4 +1,4 @@
-package fr.parisnanterre.iqplay.controllers;
+package fr.parisnanterre.iqplay.controller;
 
 import fr.parisnanterre.iqplay.dto.*;
 import fr.parisnanterre.iqplay.entity.GameCalculMental;

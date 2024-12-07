@@ -1,4 +1,4 @@
-package fr.parisnanterre.iqplay.controllers.security;
+package fr.parisnanterre.iqplay.controller.security;
 
 import fr.parisnanterre.iqplay.dto.PlayerRegistrationRequest;
 import fr.parisnanterre.iqplay.entity.Player;
