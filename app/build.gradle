@@ -75,11 +75,17 @@ repositories {
 dependencies {
     // Use JUnit test framework.
     testImplementation libs.junit
+//    implementation 'org.springframework.cloud:spring-cloud-starter-gateway:4.2.0'
+//    implementation 'org.springframework.boot:spring-boot-starter-security:3.4.0'
+//    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:3.4.0'
+//    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.4.0'
+//    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc:3.4.0'
+
+    implementation 'fr.parisnanterre:iqplaylib:0.2-SNAPSHOT'
 
     implementation 'org.springframework.boot:spring-boot-starter-web:3.3.3'
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.3.3'
     implementation 'org.apache.commons:commons-jexl3:3.2'
-    implementation 'fr.parisnanterre:iqplaylib:0.2'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -89,16 +95,11 @@ java {
     }
 }
 
-//NOUS AVONS AJOUTE CE CODE
-group = "fr.parisNanterre.DigiMenu-Orga" // defini le nom du package
-//artefact c'est le meme nom que le nom du projet
-version = "0.0.1"
+group = "fr.parisNanterre"
+version = "0.2"
 
 application {
-    // Define the main class for the application.
-    mainClass = 'fr.parisNanterre.iqPlay.App' //on renomme le nom du package
-    
-    
+    mainClass = 'fr.parisNanterre.iqPlay.App'
 }
 
 // edit the build task to generate the asciidoc pdf too
