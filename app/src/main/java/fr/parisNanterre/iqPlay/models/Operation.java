@@ -1,25 +1,46 @@
-package fr.parisNanterre.iqPlay.models;
+package fr.parisnanterre.iqplay.models;
 
-import fr.parisNanterre.iqPlay.models.interfaces.IOperation;
+import fr.parisnanterre.iqplaylib.api.ICorrectAnswer;
+import fr.parisnanterre.iqplaylib.api.IQuestion;
+import fr.parisnanterre.iqplaylib.core.CorrectAnswer;
 
-public class Operation implements IOperation {
+/**
+ * Represents an operation with an expression and its result.
+ * Implements the IQuestion interface to provide the question
+ * and its correct answer.
+ */
+public class Operation implements IQuestion {
+    private String expression;
+    private int result;
 
-    // Attributs
-    private String expression; // Représentation de l'opération (par exemple "2 + 3")
-    private int result; // Résultat de l'opération (en tant qu'entier)
-
-    // Constructeur
+    /**
+     * Constructs an Operation with the specified expression and result.
+     *
+     * @param expression the mathematical expression of the operation
+     * @param result the result of the operation
+     */
     public Operation(String expression, int result) {
         this.expression = expression;
         this.result = result;
     }
 
-    // Getters
-    public String getExpression() {
+    /**
+     * Returns the mathematical expression of the operation.
+     *
+     * @return the expression as a String
+     */
+    @Override
+    public String question() {
         return expression;
     }
 
-    public int getResult() {
-        return result;
+    /**
+     * Returns the correct answer for the operation.
+     *
+     * @return an ICorrectAnswer object containing the result of the operation as a String
+     */
+    @Override
+    public ICorrectAnswer correctAnswer() {
+        return new CorrectAnswer(String.valueOf(result));
     }
 }

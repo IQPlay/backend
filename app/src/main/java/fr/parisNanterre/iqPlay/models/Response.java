@@ -1,24 +1,30 @@
-package fr.parisNanterre.iqPlay.models;
+package fr.parisnanterre.iqplay.models;
 
-import fr.parisNanterre.iqPlay.models.interfaces.IResponse;
+import fr.parisnanterre.iqplaylib.api.IPlayerAnswer;
 
-public class Response implements IResponse {
-    // Attributs
-    private int givenAnswer; // Réponse fournie par l'utilisateur
-    private boolean isCorrect; // Indique si la réponse est correcte
+/**
+ * Represents a player's response in the game.
+ * Implements the IPlayerAnswer interface to provide the given answer as a string.
+ */
+public class Response implements IPlayerAnswer {
+    private int givenAnswer;
 
-    // Constructeur
-    public Response(int givenAnswer, boolean isCorrect) {
+    /**
+     * Constructs a Response object with the specified answer.
+     *
+     * @param givenAnswer the answer provided by the player
+     */
+    public Response(int givenAnswer) {
         this.givenAnswer = givenAnswer;
-        this.isCorrect = isCorrect;
     }
 
+    /**
+     * Returns the player's given answer as a string.
+     *
+     * @return the answer provided by the player, converted to a string
+     */
     @Override
-    public int givenAnswer() {
-        return givenAnswer;
-    }
-
-    public boolean isCorrect() {
-        return isCorrect;
+    public String answer() {
+        return String.valueOf(givenAnswer);
     }
 }

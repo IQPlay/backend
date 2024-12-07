@@ -1,18 +1,33 @@
-package fr.parisNanterre.iqPlay.models;
+package fr.parisnanterre.iqplay.models;
 
-public class GameCalculMental {
-    // Attribut pour le taux de réussite attendu (entre 0.0 et 1.0)
-    private static final double DEFAULT_SUCCESS_TARGET_RATE = 0.0; // Taux de succès fixe par défaut
+import fr.parisnanterre.iqplay.services.OperationService;
 
-    private double successTargetRate; // Taux de réussite pour cette instance
+import fr.parisnanterre.iqplaylib.core.AbstractGame;
+import fr.parisnanterre.iqplaylib.api.IGameSession;
 
-    // Constructeur
-    public GameCalculMental() {
-        this.successTargetRate = DEFAULT_SUCCESS_TARGET_RATE; // Initialise avec le taux de succès par défaut
+
+public class GameCalculMental extends AbstractGame {
+    private final OperationService operationService;
+
+    /**
+     * Represents a mental calculation game that extends the AbstractGame class.
+     * Utilizes an OperationService for generating mathematical operations.
+     *
+     * <p>Dependencies are injected via the constructor.</p>
+     *
+     * @param name the name of the game
+     * @param operationService the service used to create mathematical operations
+     *
+     * @see AbstractGame
+     * @see OperationService
+     */
+    public GameCalculMental(String name, OperationService operationService) {
+        super(name);
+        this.operationService = operationService;
     }
 
-    // Getter pour obtenir le taux de réussite
-    public double getSuccessTargetRate() {
-        return successTargetRate;
+    @Override
+    protected IGameSession createGameSession() {
+        return new GameSession(this, operationService);
     }
 }

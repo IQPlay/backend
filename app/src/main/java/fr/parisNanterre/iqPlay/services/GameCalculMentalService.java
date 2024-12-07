@@ -1,54 +1,77 @@
-package fr.parisNanterre.iqPlay.services;
+package fr.parisnanterre.iqplay.services;
 
-import fr.parisNanterre.iqPlay.models.GameSession;
-import fr.parisNanterre.iqPlay.models.GameCalculMental;
+import fr.parisnanterre.iqplay.models.GameSession;
+
 import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+
+import fr.parisnanterre.iqplaylib.api.*;
 
 @Service
-public class GameCalculMentalService implements IGameCalculMentalService {
+public class GameCalculMentalService implements IGameSessionService {
+    private final Map<Long, IGameSession> sessions = new HashMap<>();
+    private long nextId = 1;
 
-    private final GameCalculMental game;  // Objet contenant le taux de succès cible
-    private final Map<String, GameSession> sessions; // Pour stocker les sessions par ID
-    private static final int DEFAULT_INITIAL_DIFFICULTY_LEVEL = 1; // Niveau de difficulté par défaut
+    private final OperationService operationService;
 
-    public GameCalculMentalService() {
-        // Initialisation de l’objet GameCalculMental avec un taux de succès spécifique
-        this.game = new GameCalculMental(); // Exemple : taux de succès cible fixé à 0.8
-        this.sessions = new HashMap<>(); // Initialiser la Map pour stocker les sessions
+    /**
+     * Service class for managing mental calculation game sessions.
+     * Implements the IGameSessionService interface to provide functionality
+     * for creating, retrieving, and managing game sessions.
+     *
+     * <p>Uses the OperationService to generate mathematical operations for
+     * game sessions. Maintains a map of sessions identified by unique IDs.</p>
+     *
+     * @param operationService The service used to generate operations for questions.
+     */
+    public GameCalculMentalService(OperationService operationService) {
+        this.operationService = operationService;
     }
 
-    // Méthode pour démarrer une nouvelle session de jeu avec un niveau de difficulté initial fourni par le client
+    /**
+     * Creates a new game session for the specified player and game.
+     * Initializes the session using the provided game and the operation service,
+     * and stores it in the sessions map with a unique ID.
+     *
+     * @param player The player for whom the session is created.
+     * @param game The game instance associated with the session.
+     * @return The newly created game session.
+     */
     @Override
-    public GameSession newSession(int initialDifficultyLevel) {
-        String sessionId = UUID.randomUUID().toString();  // Génère un ID unique pour chaque session
-        GameSession newSession = new GameSession(sessionId, game, initialDifficultyLevel);
-        sessions.put(sessionId, newSession); // Stocker la session dans la Map
-        return newSession;
+    public IGameSession createSession(IPlayer player, IGame game) {
+        IGameSession session = new GameSession(game, operationService);
+        sessions.put(nextId++, session);
+        return session;
     }
 
-    // Méthode pour démarrer une nouvelle session avec une difficulté par défaut de 1
+    /**
+     * Retrieves a game session by its unique session ID.
+     *
+     * @param sessionId The unique identifier of the session to retrieve.
+     * @return The game session associated with the given session ID, or null if no session is found.
+     */
     @Override
-    public GameSession newSession() {
-        return newSession(DEFAULT_INITIAL_DIFFICULTY_LEVEL); // Utilise la méthode avec paramètre pour créer une session avec difficulté 1
+    public IGameSession findSession(Long sessionId) {
+        return sessions.get(sessionId);
     }
 
-    // Méthode pour récupérer une session par son ID
-    public GameSession getSessionById(String sessionId) {
-        return sessions.get(sessionId); // Retourne la session correspondante ou null si non trouvée
-    }
-
-    // Méthode pour supprimer une session
-    public void removeSession(String sessionId) {
-        sessions.remove(sessionId); // Méthode pour supprimer une session
-    }
-
+    /**
+     * Retrieves the unique session ID associated with the given game session.
+     * Iterates through the stored sessions to find a match with the provided session object.
+     *
+     * @param session The game session for which the ID is to be retrieved.
+     * @return The unique ID of the session, or null if no matching session is found.
+     */
     @Override
-    public void updateDifficultyLevel(double successRate, GameSession gameSession) {
-        if (successRate > game.getSuccessTargetRate()) {
-            gameSession.setDifficultyLevel(gameSession.getDifficultyLevel() + 1);
-        }
+    public Long getSessionId(IGameSession session) {
+        // Parcourt les sessions pour trouver la correspondance avec l'objet session
+        return sessions.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(session))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null); // Retourne null si aucune correspondance
     }
+
 }
+

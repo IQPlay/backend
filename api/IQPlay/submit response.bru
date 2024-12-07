@@ -1,0 +1,19 @@
+meta {
+  name: submit response
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8080/api/game/answer/3?userAnswer=-14
+  body: none
+  auth: none
+}
+
+params:query {
+  userAnswer: -14
+}
+
+docs {
+  /api/game/operation/{sessionId}?userAnswer={integer}
+}

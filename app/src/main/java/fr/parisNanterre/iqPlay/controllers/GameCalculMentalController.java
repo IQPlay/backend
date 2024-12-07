@@ -1,155 +1,207 @@
-package fr.parisNanterre.iqPlay.controllers;
+package fr.parisnanterre.iqplay.controllers;
 
-import fr.parisNanterre.iqPlay.models.GameSession;
-import fr.parisNanterre.iqPlay.models.Operation;
-import fr.parisNanterre.iqPlay.models.Response;
-import fr.parisNanterre.iqPlay.services.GameCalculMentalService;
-import fr.parisNanterre.iqPlay.services.OperationService;
+import fr.parisnanterre.iqplay.models.GameCalculMental;
+import fr.parisnanterre.iqplay.models.Player;
+import fr.parisnanterre.iqplay.models.Response;
+import fr.parisnanterre.iqplay.services.GameCalculMentalService;
+import fr.parisnanterre.iqplay.services.OperationService;
+
+import fr.parisnanterre.iqplaylib.api.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+/**
+ * REST controller for managing mental calculation game sessions.
+ * Provides endpoints to start, stop, and interact with game sessions.
+ *
+ * <p>Endpoints:</p>
+ * <ul>
+ *   <li>/start: Initiates a new game session with a specified difficulty.</li>
+ *   <li>/operation/{sessionId}: Retrieves the next operation for a given session.</li>
+ *   <li>/answer/{sessionId}: Submits an answer for the current operation in a session.</li>
+ *   <li>/stop/{sessionId}: Stops an ongoing game session.</li>
+ * </ul>
+ *
+ * <p>Uses GameCalculMentalService for session management and OperationService
+ * for generating operations.</p>
+ *
+ * @see GameCalculMentalService
+ * @see OperationService
+ */
 @RestController
 @RequestMapping("/api/game")
 public class GameCalculMentalController {
+    private final GameCalculMentalService gameSessionService;
+    private final OperationService operationService;
 
+    private static final String message = "message";
+    private static final String score = "score";
+    private static final String gameStatus = "status";
+
+    /**
+     * Constructs a GameCalculMentalController with the specified services.
+     *
+     * @param gameSessionService the service for managing game sessions
+     * @param operationService the service for generating operations
+     */
     @Autowired
-    private GameCalculMentalService gameCalculMentalService;
+    public GameCalculMentalController(GameCalculMentalService gameSessionService, OperationService operationService) {
+        this.gameSessionService = gameSessionService;
+        this.operationService = operationService;
+    }
 
-    @Autowired
-    private OperationService operationService;
-
-    // Démarre une nouvelle session avec un niveau de difficulté spécifié et génère des opérations
+    /**
+     * Starts a new mental calculation game session with the specified difficulty.
+     * Initializes a default player and game, creates a session, and starts it.
+     * Returns a response entity containing a message and the session ID.
+     *
+     * @param difficulty the difficulty level for the game session
+     * @return ResponseEntity containing a message and the session ID
+     */
     @PostMapping("/start")
     public ResponseEntity<?> startGame(@RequestParam int difficulty) {
-        // Créer une nouvelle session avec le niveau de difficulté donné
-        GameSession session = gameCalculMentalService.newSession(difficulty);
+        IPlayer player = new Player("Default User");
+        IGame game = new GameCalculMental("Calcul Mental", operationService);
+        IGameSession session = gameSessionService.createSession(player, game);
+        session.start();
 
-        if (difficulty == 0) {
-            throw new NullPointerException("erreur pointeur");
-            // Si la session n'a pas pu être créée, renvoyer une erreur avec un message structuré
-//            return ResponseEntity.status(500).body(Map.of(
-//                "message", "Erreur lors de la création de la session",
-//                "sessionId", null
-//            ));
-        }
-        
-        // Générer la séquence d'opérations pour cette session
-        List<Operation> operations = operationService.createSequenceNOperation(session.getDifficultyLevel());
-        
-        if (operations == null || operations.isEmpty()) {
-            // Si aucune opération n'a été générée, renvoyer une erreur avec un message structuré
-            return ResponseEntity.status(500).body(Map.of(
-                "message", "Erreur lors de la génération des opérations",
-                "sessionId", null
-            ));
-        }
-    
-        session.setCurrentOperations(operations); // Stocker les opérations dans la session
-        
-        // Retourner un message confirmant que la session a été démarrée et l'ID de session
+        Long sessionId = gameSessionService.getSessionId(session);
+
         return ResponseEntity.ok(Map.of(
-            "message", "Session démarrée avec succès.",
-            "sessionId", session.getSessionID()
+                GameCalculMentalController.message, GameMessageEnum.SESSION_STARTED.message(),
+                "sessionId", sessionId
         ));
     }
-    
-    
-    
 
-    // Obtenir la prochaine opération
+    /**
+     * Retrieves the next operation for a given game session.
+     * Checks if the session exists and is active, and if there are no pending operations.
+     * Returns the next operation or an appropriate error message if conditions are not met.
+     *
+     * @param sessionId The unique identifier of the game session.
+     * @return ResponseEntity containing the next operation or an error message.
+     */
     @GetMapping("/operation/{sessionId}")
-    public ResponseEntity<Operation> getNextOperation(@PathVariable String sessionId) {
-        GameSession session = gameCalculMentalService.getSessionById(sessionId);
+    public ResponseEntity<?> getNextOperation(@PathVariable Long sessionId) {
+        IGameSession session = gameSessionService.findSession(sessionId);
         if (session == null) {
-            return ResponseEntity.notFound().build(); // Retourne 404 si la session n'existe pas
+            return ResponseEntity.status(404).body(Map.of(
+                    GameCalculMentalController.message, GameMessageEnum.SESSION_NOT_FOUND.message(),
+                    GameCalculMentalController.gameStatus, "UNKNOWN"
+            ));
         }
 
-        // Vérifier s'il y a des opérations disponibles
-        List<Operation> operations = session.getCurrentOperations();
-        if (operations.isEmpty()) {
-            return ResponseEntity.noContent().build(); // Retourne 204 si aucune opération
+        if (session.state() == StateGameSessionEnum.ENDED) {
+            return ResponseEntity.status(400).body(Map.of(
+                    GameCalculMentalController.message, GameMessageEnum.GAME_ENDED_NO_OPERATION.message(),
+                    GameCalculMentalController.score, session.score().score(),
+                    GameCalculMentalController.gameStatus, "ENDED"
+            ));
         }
 
-        Operation nextOperation = operations.get(0); // Prendre la première opération
-        return ResponseEntity.ok(nextOperation);
+        // Vérifie si une opération précédente est en attente de réponse
+        IQuestion lastQuestion = session.questionStorage().lastQuestion();
+        if (lastQuestion != null && session.questionStorage().lastPlayerAnswer() == null) {
+            return ResponseEntity.status(400).body(Map.of(
+                    GameCalculMentalController.message, GameMessageEnum.OPERATION_PENDING.message(),
+                    "question", lastQuestion.question(),
+                    GameCalculMentalController.gameStatus, "BLOCKED"
+            ));
+        }
+
+        // Génère une nouvelle opération si aucune n'est en attente
+        IQuestion nextQuestion = session.nextQuestion();
+        return ResponseEntity.ok(Map.of(
+                "question", nextQuestion.question()
+        ));
     }
 
-    // Soumettre une réponse
+    /**
+     * Submits a player's answer for the current operation in a game session.
+     * Validates the session's existence and state before processing the answer.
+     * Returns a response entity with the result of the submission, including
+     * the next question if the game continues, or the final score if the game ends.
+     *
+     * @param sessionId The unique identifier of the game session.
+     * @param userAnswer The answer provided by the player.
+     * @return ResponseEntity containing the result of the answer submission,
+     *         including messages, score, and game status.
+     */
     @PostMapping("/answer/{sessionId}")
-    public ResponseEntity<?> submitAnswer(@PathVariable String sessionId, @RequestParam int userAnswer) {
-        GameSession session = gameCalculMentalService.getSessionById(sessionId);
+    public ResponseEntity<?> submitAnswer(@PathVariable Long sessionId, @RequestParam int userAnswer) {
+        IGameSession session = gameSessionService.findSession(sessionId);
         if (session == null) {
-            return ResponseEntity.notFound().build(); // Retourne 404 si la session n'existe pas
+            return ResponseEntity.status(404).body(Map.of(
+                    GameCalculMentalController.message, GameMessageEnum.SESSION_NOT_FOUND.message(),
+                    GameCalculMentalController.gameStatus, "UNKNOWN"
+            ));
         }
 
-        // Récupérer l'opération actuelle
-        List<Operation> operations = session.getCurrentOperations();
-        if (operations.isEmpty()) {
-            return ResponseEntity.noContent().build(); // Retourne 204 si aucune opération
+        if (session.state() == StateGameSessionEnum.ENDED) {
+            return ResponseEntity.status(400).body(Map.of(
+                    GameCalculMentalController.message, GameMessageEnum.GAME_ENDED_NO_RESPONSE.message(),
+                    GameCalculMentalController.score, session.score().score(),
+                    GameCalculMentalController.gameStatus, "ENDED"
+        ));
         }
 
-        Operation currentOperation = operations.get(0); // Prendre la première opération
-        
-        // Utiliser le service pour créer la réponse
-        Response feedbackResponse = operationService.createResponse(userAnswer, currentOperation);
+        IPlayerAnswer answer = new Response(userAnswer);
+        session.submitAnswer(answer);
 
-        // Feedback à l'utilisateur
-        String feedback = feedbackResponse.isCorrect() ? "Réponse correcte !" : "Réponse incorrecte ! Le résultat est : " + currentOperation.getResult();
+        if (session.state() == StateGameSessionEnum.ENDED) {
+            return ResponseEntity.ok(Map.of(
+                    GameCalculMentalController.message, GameMessageEnum.GAME_ENDED_NO_RESPONSE.message(),
+                    GameCalculMentalController.score, session.score().score(),
+                    GameCalculMentalController.gameStatus, "ENDED"
+            ));
+        }
 
-        // Supprimer l'opération de la liste
-        operations.remove(0);
-
-        // Préparer la réponse JSON sans renvoyer l'opération suivante
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("feedback", feedback);
-        responseBody.put("gameStatus", operations.isEmpty() ? "COMPLETED" : "IN_PROGRESS");
-
-        return ResponseEntity.ok(responseBody);
+        IQuestion nextQuestion = session.nextQuestion();
+        return ResponseEntity.ok(Map.of(
+                GameCalculMentalController.message, GameMessageEnum.ANSWER_CORRECT.message(),
+                GameCalculMentalController.score, session.score().score(),
+                "nextQuestion", nextQuestion.question()
+        ));
     }
 
-    // Route pour arrêter et supprimer la session
+    /**
+     * Stops an ongoing mental calculation game session.
+     * Validates the session's existence and state before stopping it.
+     * Returns a response entity with the result of the stop action,
+     * including messages, score, and game status.
+     *
+     * @param sessionId The unique identifier of the game session.
+     * @return ResponseEntity containing the result of the stop action,
+     *         including messages, score, and game status.
+     */
     @PostMapping("/stop/{sessionId}")
-    public ResponseEntity<String> stopGame(@PathVariable String sessionId) {
-        // Vérifier si la session existe dans la Map
-        GameSession session = gameCalculMentalService.getSessionById(sessionId);
-
+    public ResponseEntity<?> stopGame(@PathVariable Long sessionId) {
+        IGameSession session = gameSessionService.findSession(sessionId);
         if (session == null) {
-            // Si la session n'existe pas, renvoyer une erreur 404
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).body(Map.of(
+                    GameCalculMentalController.message, GameMessageEnum.SESSION_NOT_FOUND.message(),
+                    GameCalculMentalController.gameStatus, "UNKNOWN"
+            ));
         }
 
-        // Supprimer la session à l'aide du service
-        gameCalculMentalService.removeSession(sessionId);
-
-        // Retourner une réponse de succès
-        return ResponseEntity.ok("Session terminée et supprimée en mémoire. Le jeu est arrêté.");
-    }
-
-    // Ajuster la difficulté et continuer le jeu
-    @PostMapping("/continue/{sessionId}")
-    public ResponseEntity<String> continueGame(@PathVariable String sessionId) {
-        // Récupérer la session avec l'ID donné
-        GameSession session = gameCalculMentalService.getSessionById(sessionId);
-    
-        // Si la session n'existe pas, retourner une erreur 404
-        if (session == null) {
-            return ResponseEntity.notFound().build(); 
+        if (session.state() == StateGameSessionEnum.ENDED) {
+            return ResponseEntity.status(400).body(Map.of(
+                    GameCalculMentalController.message, GameMessageEnum.GAME_ALREADY_ENDED.message(),
+                    GameCalculMentalController.score, session.score().score(),
+                    GameCalculMentalController.gameStatus, "ENDED"
+        ));
         }
-    
-        // Mettre à jour la difficulté de la session en fonction du taux de succès actuel
-        gameCalculMentalService.updateDifficultyLevel(session.getSuccessTargetRate(), session);
-    
-        // Générer une nouvelle séquence d'opérations pour cette session
-        List<Operation> newOperations = operationService.createSequenceNOperation(session.getDifficultyLevel());
-        session.setCurrentOperations(newOperations); // Mettre à jour la liste des opérations
-    
-        // Retourner une réponse de succès avec un message
-        return ResponseEntity.ok("Difficulté mise à jour. Nouvelles opérations générées.");
+
+        session.end();
+        return ResponseEntity.ok(Map.of(
+                GameCalculMentalController.message, GameMessageEnum.GAME_STOPPED.message(),
+                GameCalculMentalController.score, session.score().score(),
+                GameCalculMentalController.gameStatus, "ENDED"
+        ));
     }
-    
+
 }
