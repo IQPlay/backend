@@ -1,6 +1,6 @@
-package fr.parisnanterre.iqplay.models;
+package fr.parisnanterre.iqplay.entity;
 
-import fr.parisnanterre.iqplay.services.OperationService;
+import fr.parisnanterre.iqplay.service.OperationService;
 
 import fr.parisnanterre.iqplaylib.core.AbstractGameSession;
 import fr.parisnanterre.iqplaylib.api.*;

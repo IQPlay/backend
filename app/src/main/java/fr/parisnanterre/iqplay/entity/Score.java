@@ -1,4 +1,4 @@
-package fr.parisnanterre.iqplay.models;
+package fr.parisnanterre.iqplay.entity;
 
 import fr.parisnanterre.iqplaylib.api.IScore;
 

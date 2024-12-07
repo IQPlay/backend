@@ -1,6 +1,6 @@
-package fr.parisnanterre.iqplay.services;
+package fr.parisnanterre.iqplay.service;
 
-import fr.parisnanterre.iqplay.models.GameSession;
+import fr.parisnanterre.iqplay.entity.GameSession;
 
 import org.springframework.stereotype.Service;
 import java.util.HashMap;

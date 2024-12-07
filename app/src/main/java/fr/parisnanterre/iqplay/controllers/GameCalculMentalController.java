@@ -1,11 +1,11 @@
 package fr.parisnanterre.iqplay.controllers;
 
 import fr.parisnanterre.iqplay.dto.*;
-import fr.parisnanterre.iqplay.models.GameCalculMental;
-import fr.parisnanterre.iqplay.models.Player;
-import fr.parisnanterre.iqplay.models.Response;
-import fr.parisnanterre.iqplay.services.GameCalculMentalService;
-import fr.parisnanterre.iqplay.services.OperationService;
+import fr.parisnanterre.iqplay.entity.GameCalculMental;
+import fr.parisnanterre.iqplay.entity.Player;
+import fr.parisnanterre.iqplay.entity.Response;
+import fr.parisnanterre.iqplay.service.GameCalculMentalService;
+import fr.parisnanterre.iqplay.service.OperationService;
 import fr.parisnanterre.iqplaylib.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

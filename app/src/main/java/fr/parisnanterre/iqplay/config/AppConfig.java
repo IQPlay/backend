@@ -1,7 +1,7 @@
 package fr.parisnanterre.iqplay.config;
 
-import fr.parisnanterre.iqplay.models.GameCalculMental;
-import fr.parisnanterre.iqplay.services.OperationService;
+import fr.parisnanterre.iqplay.entity.GameCalculMental;
+import fr.parisnanterre.iqplay.service.OperationService;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

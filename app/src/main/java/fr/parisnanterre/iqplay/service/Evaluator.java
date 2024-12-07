@@ -1,4 +1,4 @@
-package fr.parisnanterre.iqplay.services;
+package fr.parisnanterre.iqplay.service;
 
 import org.apache.commons.jexl3.*;
 

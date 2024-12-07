@@ -1,6 +1,6 @@
-package fr.parisnanterre.iqplay.services;
+package fr.parisnanterre.iqplay.service;
 
-import fr.parisnanterre.iqplay.models.Response;
+import fr.parisnanterre.iqplay.entity.Response;
 
 import java.util.List;
 import java.util.ArrayList;
