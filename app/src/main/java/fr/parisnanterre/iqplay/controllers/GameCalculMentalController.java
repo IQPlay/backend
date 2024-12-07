@@ -35,7 +35,7 @@ public class GameCalculMentalController {
      */
     @PostMapping("/start")
     public ResponseEntity<StartGameResponse> startGame(@RequestBody StartGameRequest request) {
-        IPlayer player = new Player("Default User");
+        IPlayer player = new Player();
         IGame game = new GameCalculMental("Calcul Mental", operationService);
         IGameSession session = gameSessionService.createSession(player, game);
         session.start();
