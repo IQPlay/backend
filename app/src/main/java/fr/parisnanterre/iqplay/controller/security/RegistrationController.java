@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 public class RegistrationController {
@@ -21,21 +23,19 @@ public class RegistrationController {
     @PostMapping("/register")
     public ResponseEntity<?> registerPlayer(@RequestBody PlayerRegistrationRequest request) {
         try {
-            // Debug log for incoming request
-            System.out.println("Email: " + request.email());
-            System.out.println("Username: " + request.username());
-            System.out.println("Password: " + request.password());
-
             if (request.email() == null || request.username() == null || request.password() == null) {
-                return ResponseEntity.badRequest().body("Email, username, and password cannot be null or empty.");
+                return ResponseEntity.badRequest().body(Map.of("error", "Email, username, and password cannot be null or empty."));
             }
 
             Player player = playerService.registerPlayer(request.email(), request.username(), request.password());
-            return ResponseEntity.ok("Player registered successfully with ID: " + player.id());
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "Player registered successfully",
+                    "playerId", player.id()
+            ));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
-
 
 }
