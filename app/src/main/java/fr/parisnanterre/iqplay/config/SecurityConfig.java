@@ -18,6 +18,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // Désactiver CSRF proprement
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Autoriser les endpoints d'inscription
+                        .requestMatchers("/api/game/**").permitAll() // Autoriser les endpoints de jeu
                         .anyRequest().authenticated() // Toutes les autres requêtes nécessitent une authentification
                 )
                 .httpBasic(Customizer.withDefaults()); // Ajouter une méthode d'authentification simple (par exemple, HTTP Basic)
@@ -27,6 +28,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Use BCrypt for hashing passwords
+        return new BCryptPasswordEncoder(); // Utilisation de BCrypt pour le hachage des mots de passe
     }
 }
+
