@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * REST controller for managing mental calculation game sessions.
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/api/game")
 public class GameCalculMentalController {
@@ -54,14 +55,16 @@ public class GameCalculMentalController {
      * @return ResponseEntity containing the next operation or an error message.
      */
     @GetMapping("/operation/{sessionId}")
-    public ResponseEntity<?> getNextOperation(@PathVariable Long sessionId) {
+    public ResponseEntity<NextOperationResponseDto> getNextOperation(@PathVariable Long sessionId) {
         IGameSession session = gameSessionService.findSession(sessionId);
         ResponseEntity<GameStopResponseDto> validationResponse = validateSession(session);
-        if (validationResponse != null) return validationResponse;
+        if (validationResponse != null) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body(null);
+        }
 
         IQuestion lastQuestion = session.questionStorage().lastQuestion();
         if (lastQuestion != null && session.questionStorage().lastPlayerAnswer() == null) {
-            return ResponseEntity.status(400).body(new NextOperationResponseDto(
+            return ResponseEntity.ok(new NextOperationResponseDto(
                     GameMessageEnum.OPERATION_PENDING.message(),
                     lastQuestion.question(),
                     "BLOCKED"
@@ -84,10 +87,15 @@ public class GameCalculMentalController {
      * @return ResponseEntity containing the result of the submission.
      */
     @PostMapping("/answer/{sessionId}")
-    public ResponseEntity<?> submitAnswer(@PathVariable Long sessionId, @RequestBody SubmitAnswerRequestDto request) {
+    public ResponseEntity<SubmitAnswerResponseDto> submitAnswer(
+            @PathVariable Long sessionId,
+            @RequestBody SubmitAnswerRequestDto request
+    ) {
         IGameSession session = gameSessionService.findSession(sessionId);
         ResponseEntity<GameStopResponseDto> validationResponse = validateSession(session);
-        if (validationResponse != null) return validationResponse;
+        if (validationResponse != null) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body(null);
+        }
 
         IPlayerAnswer answer = new Response(request.getUserAnswer());
         session.submitAnswer(answer);
@@ -120,7 +128,9 @@ public class GameCalculMentalController {
     public ResponseEntity<GameStopResponseDto> stopGame(@PathVariable Long sessionId) {
         IGameSession session = gameSessionService.findSession(sessionId);
         ResponseEntity<GameStopResponseDto> validationResponse = validateSession(session);
-        if (validationResponse != null) return validationResponse;
+        if (validationResponse != null) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body(validationResponse.getBody());
+        }
 
         session.end();
         return ResponseEntity.ok(new GameStopResponseDto(
