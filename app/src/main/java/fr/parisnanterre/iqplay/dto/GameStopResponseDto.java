@@ -1,23 +1,22 @@
 package fr.parisnanterre.iqplay.dto;
 
-public class NextOperationResponse implements IDto {
+public class GameStopResponseDto {
     private String message;
-    private String question;
+    private int score;
     private String status;
 
-    public NextOperationResponse(String message, String question, String status) {
+    public GameStopResponseDto(String message, int score, String status) {
         this.message = message;
-        this.question = question;
+        this.score = score;
         this.status = status;
     }
 
-    @Override
     public String message() {
         return message;
     }
 
-    public String getQuestion() {
-        return question;
+    public int getScore() {
+        return score;
     }
 
     public String getStatus() {

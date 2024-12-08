@@ -1,6 +1,6 @@
 package fr.parisnanterre.iqplay.controller.security;
 
-import fr.parisnanterre.iqplay.dto.PlayerRegistrationRequest;
+import fr.parisnanterre.iqplay.dto.PlayerRegistrationRequestDto;
 import fr.parisnanterre.iqplay.entity.Player;
 import fr.parisnanterre.iqplay.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class RegistrationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerPlayer(@RequestBody PlayerRegistrationRequest request) {
+    public ResponseEntity<?> registerPlayer(@RequestBody PlayerRegistrationRequestDto request) {
         try {
             if (request.email() == null || request.username() == null || request.password() == null) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Email, username, and password cannot be null or empty."));

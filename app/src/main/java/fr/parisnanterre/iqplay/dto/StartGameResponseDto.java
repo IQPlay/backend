@@ -1,15 +1,14 @@
 package fr.parisnanterre.iqplay.dto;
 
-public class StartGameResponse implements IDto {
+public class StartGameResponseDto {
     private String message;
     private Long sessionId;
 
-    public StartGameResponse(String message, Long sessionId) {
+    public StartGameResponseDto(String message, Long sessionId) {
         this.message = message;
         this.sessionId = sessionId;
     }
 
-    @Override
     public String message() {
         return message;
     }

@@ -3,7 +3,7 @@ package fr.parisnanterre.iqplay.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.parisnanterre.iqplay.entity.api.IUser;
 
-public class PlayerRegistrationRequest implements IUser {
+public class PlayerRegistrationRequestDto implements IUser {
 
     @JsonProperty
     private String email;
@@ -15,7 +15,7 @@ public class PlayerRegistrationRequest implements IUser {
     private String password;
 
     // No-args constructor (mandatory for Spring)
-    public PlayerRegistrationRequest() {}
+    public PlayerRegistrationRequestDto() {}
 
     @Override
     public String email() {

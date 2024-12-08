@@ -34,14 +34,14 @@ public class GameCalculMentalController {
      * @return ResponseEntity containing the session ID.
      */
     @PostMapping("/start")
-    public ResponseEntity<StartGameResponse> startGame(@RequestBody StartGameRequest request) {
+    public ResponseEntity<StartGameResponseDto> startGame(@RequestBody StartGameRequestDto request) {
         IPlayer player = new Player();
         IGame game = new GameCalculMental("Calcul Mental", operationService);
         IGameSession session = gameSessionService.createSession(player, game);
         session.start();
 
         Long sessionId = gameSessionService.getSessionId(session);
-        return ResponseEntity.ok(new StartGameResponse(
+        return ResponseEntity.ok(new StartGameResponseDto(
                 GameMessageEnum.SESSION_STARTED.message(),
                 sessionId
         ));
@@ -56,12 +56,12 @@ public class GameCalculMentalController {
     @GetMapping("/operation/{sessionId}")
     public ResponseEntity<?> getNextOperation(@PathVariable Long sessionId) {
         IGameSession session = gameSessionService.findSession(sessionId);
-        ResponseEntity<GameStopResponse> validationResponse = validateSession(session);
+        ResponseEntity<GameStopResponseDto> validationResponse = validateSession(session);
         if (validationResponse != null) return validationResponse;
 
         IQuestion lastQuestion = session.questionStorage().lastQuestion();
         if (lastQuestion != null && session.questionStorage().lastPlayerAnswer() == null) {
-            return ResponseEntity.status(400).body(new NextOperationResponse(
+            return ResponseEntity.status(400).body(new NextOperationResponseDto(
                     GameMessageEnum.OPERATION_PENDING.message(),
                     lastQuestion.question(),
                     "BLOCKED"
@@ -69,7 +69,7 @@ public class GameCalculMentalController {
         }
 
         IQuestion nextQuestion = session.nextQuestion();
-        return ResponseEntity.ok(new NextOperationResponse(
+        return ResponseEntity.ok(new NextOperationResponseDto(
                 null,
                 nextQuestion.question(),
                 "READY"
@@ -84,16 +84,16 @@ public class GameCalculMentalController {
      * @return ResponseEntity containing the result of the submission.
      */
     @PostMapping("/answer/{sessionId}")
-    public ResponseEntity<?> submitAnswer(@PathVariable Long sessionId, @RequestBody SubmitAnswerRequest request) {
+    public ResponseEntity<?> submitAnswer(@PathVariable Long sessionId, @RequestBody SubmitAnswerRequestDto request) {
         IGameSession session = gameSessionService.findSession(sessionId);
-        ResponseEntity<GameStopResponse> validationResponse = validateSession(session);
+        ResponseEntity<GameStopResponseDto> validationResponse = validateSession(session);
         if (validationResponse != null) return validationResponse;
 
         IPlayerAnswer answer = new Response(request.getUserAnswer());
         session.submitAnswer(answer);
 
         if (session.state() == StateGameSessionEnum.ENDED) {
-            return ResponseEntity.ok(new SubmitAnswerResponse(
+            return ResponseEntity.ok(new SubmitAnswerResponseDto(
                     GameMessageEnum.GAME_ENDED_NO_RESPONSE.message(),
                     session.score().score(),
                     "ENDED",
@@ -102,7 +102,7 @@ public class GameCalculMentalController {
         }
 
         IQuestion nextQuestion = session.nextQuestion();
-        return ResponseEntity.ok(new SubmitAnswerResponse(
+        return ResponseEntity.ok(new SubmitAnswerResponseDto(
                 GameMessageEnum.ANSWER_CORRECT.message(),
                 session.score().score(),
                 "IN_PROGRESS",
@@ -117,13 +117,13 @@ public class GameCalculMentalController {
      * @return ResponseEntity containing the result of the stop action.
      */
     @PostMapping("/stop/{sessionId}")
-    public ResponseEntity<GameStopResponse> stopGame(@PathVariable Long sessionId) {
+    public ResponseEntity<GameStopResponseDto> stopGame(@PathVariable Long sessionId) {
         IGameSession session = gameSessionService.findSession(sessionId);
-        ResponseEntity<GameStopResponse> validationResponse = validateSession(session);
+        ResponseEntity<GameStopResponseDto> validationResponse = validateSession(session);
         if (validationResponse != null) return validationResponse;
 
         session.end();
-        return ResponseEntity.ok(new GameStopResponse(
+        return ResponseEntity.ok(new GameStopResponseDto(
                 GameMessageEnum.GAME_STOPPED.message(),
                 session.score().score(),
                 "ENDED"
@@ -136,9 +136,9 @@ public class GameCalculMentalController {
      * @param session The game session to validate.
      * @return ResponseEntity if invalid, null if valid.
      */
-    private ResponseEntity<GameStopResponse> validateSession(IGameSession session) {
+    private ResponseEntity<GameStopResponseDto> validateSession(IGameSession session) {
         if (session == null) {
-            return ResponseEntity.status(404).body(new GameStopResponse(
+            return ResponseEntity.status(404).body(new GameStopResponseDto(
                     GameMessageEnum.SESSION_NOT_FOUND.message(),
                     0,
                     "UNKNOWN"
@@ -146,7 +146,7 @@ public class GameCalculMentalController {
         }
 
         if (session.state() == StateGameSessionEnum.ENDED) {
-            return ResponseEntity.status(400).body(new GameStopResponse(
+            return ResponseEntity.status(400).body(new GameStopResponseDto(
                     GameMessageEnum.GAME_ALREADY_ENDED.message(),
                     session.score().score(),
                     "ENDED"

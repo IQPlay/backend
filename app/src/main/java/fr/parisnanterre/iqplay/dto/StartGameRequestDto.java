@@ -1,6 +1,6 @@
 package fr.parisnanterre.iqplay.dto;
 
-public class StartGameRequest {
+public class StartGameRequestDto {
     private int difficulty;
 
     // Getters and Setters

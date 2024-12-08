@@ -1,6 +1,6 @@
 package fr.parisnanterre.iqplay.dto;
 
-public class SubmitAnswerRequest {
+public class SubmitAnswerRequestDto {
     private int userAnswer;
 
     // Getters and Setters
