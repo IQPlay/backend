@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "IQPlay",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
