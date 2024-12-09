@@ -3,6 +3,7 @@ package fr.parisnanterre.iqplay.controller.security;
 import fr.parisnanterre.iqplay.dto.PlayerRequestDto;
 import fr.parisnanterre.iqplay.entity.Player;
 import fr.parisnanterre.iqplay.provider.JwtProvider;
+import fr.parisnanterre.iqplay.service.JwtBlacklistService;
 import fr.parisnanterre.iqplay.service.PlayerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,10 +19,12 @@ public class AuthenticationController {
 
     private final PlayerService playerService;
     private final JwtProvider jwtProvider;
+    private final JwtBlacklistService jwtBlacklistService;
 
-    public AuthenticationController(PlayerService playerService, JwtProvider jwtProvider) {
+    public AuthenticationController(PlayerService playerService, JwtProvider jwtProvider, JwtBlacklistService jwtBlacklistService) {
         this.playerService = playerService;
         this.jwtProvider = jwtProvider;
+        this.jwtBlacklistService = jwtBlacklistService;
     }
 
     @PostMapping("/login")
@@ -31,7 +34,6 @@ public class AuthenticationController {
                     "error", "Email and password must be provided."
             ));
         }
-
         try {
             Player player = playerService.authenticatePlayer(request.email(), request.password());
 
@@ -39,7 +41,6 @@ public class AuthenticationController {
             String token = jwtProvider.generateToken(
                     new UsernamePasswordAuthenticationToken(player.email(), null)
             );
-
             return ResponseEntity.ok(Map.of("token", token));
         } catch (IllegalArgumentException e) {
             // Gestion des erreurs (email non trouvé ou mot de passe invalide)
@@ -56,15 +57,25 @@ public class AuthenticationController {
             // L'utilisateur est authentifié
             return ResponseEntity.ok(Map.of(
                     "authenticated", true,
-                    "user", authentication.getName() // Renvoie le principal (par ex., email ou username)
+                    "user", authentication.getName()
             ));
         }
-
         // L'utilisateur n'est pas authentifié
         return ResponseEntity.ok(Map.of(
                 "authenticated", false,
                 "user", "anonymous"
         ));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String authorizationHeader) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid or missing Authorization header"));
+        }
+
+        String token = authorizationHeader.substring(7); // Supprime "Bearer "
+        playerService.logout(token);
+        return ResponseEntity.ok(Map.of("message", "Successfully logged out"));
     }
 
 }

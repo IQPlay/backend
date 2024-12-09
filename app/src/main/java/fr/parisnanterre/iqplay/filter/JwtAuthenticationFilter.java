@@ -1,6 +1,7 @@
 package fr.parisnanterre.iqplay.filter;
 
 import fr.parisnanterre.iqplay.provider.JwtProvider;
+import fr.parisnanterre.iqplay.service.JwtBlacklistService;
 import fr.parisnanterre.iqplay.service.PlayerDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,10 +20,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
     private final PlayerDetailsService playerDetailsService;
+    private final JwtBlacklistService jwtBlacklistService;
 
-    public JwtAuthenticationFilter(JwtProvider jwtProvider, PlayerDetailsService playerDetailsService) {
+    public JwtAuthenticationFilter(JwtProvider jwtProvider, PlayerDetailsService playerDetailsService, JwtBlacklistService jwtBlacklistService) {
         this.jwtProvider = jwtProvider;
         this.playerDetailsService = playerDetailsService;
+        this.jwtBlacklistService = jwtBlacklistService;
     }
 
     @Override
@@ -31,26 +34,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         String authorizationHeader = request.getHeader("Authorization");
 
-        String token = null;
-        String username = null;
-
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            token = authorizationHeader.substring(7);
-            if (jwtProvider.validateToken(token)) {
-                username = jwtProvider.getUsernameFromToken(token);
-            }
-        }
+            String token = authorizationHeader.substring(7);
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = playerDetailsService.loadUserByUsername(username);
-            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                    userDetails,
-                    null,
-                    userDetails.getAuthorities()
-            );
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            if (jwtBlacklistService.isTokenBlacklisted(token)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token is invalidated");
+                return;
+            }
+
+            if (jwtProvider.validateToken(token)) {
+                String username = jwtProvider.getUsernameFromToken(token);
+
+                UserDetails userDetails = playerDetailsService.loadUserByUsername(username);
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
+                );
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
         }
 
         filterChain.doFilter(request, response);
     }
+
+
 }

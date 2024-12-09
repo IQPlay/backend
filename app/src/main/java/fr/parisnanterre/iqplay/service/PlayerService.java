@@ -3,6 +3,7 @@ package fr.parisnanterre.iqplay.service;
 import fr.parisnanterre.iqplay.entity.Player;
 import fr.parisnanterre.iqplay.repository.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -11,11 +12,13 @@ public class PlayerService {
 
     private final PlayerRepository playerRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtBlacklistService jwtBlacklistService;
 
     @Autowired
-    public PlayerService(PlayerRepository playerRepository, PasswordEncoder passwordEncoder) {
+    public PlayerService(PlayerRepository playerRepository, PasswordEncoder passwordEncoder, JwtBlacklistService jwtBlacklistService) {
         this.playerRepository = playerRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtBlacklistService = jwtBlacklistService;
     }
 
     /**
@@ -64,4 +67,15 @@ public class PlayerService {
 
         return player;
     }
+
+    public void logout(String token) {
+        if (token == null || token.isEmpty()) {
+            throw new IllegalArgumentException("Token must not be null or empty.");
+        }
+        // Ajoute le token à la liste de révocation
+        jwtBlacklistService.invalidateToken(token);
+        // Efface le SecurityContext actuel
+        SecurityContextHolder.clearContext();
+    }
+
 }
