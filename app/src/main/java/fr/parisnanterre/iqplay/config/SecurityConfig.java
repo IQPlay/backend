@@ -32,7 +32,10 @@ public class SecurityConfig {
                 // On ne spécifie plus httpBasic, car on utilise du JWT.
                 // .httpBasic(Customizer.withDefaults());
                 // On ajoute le filtre JWT avant le UsernamePasswordAuthenticationFilter
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .anonymous(Customizer.withDefaults())  // Active les utilisateurs anonymes
+        ;
+
 
         return http.build();
     }

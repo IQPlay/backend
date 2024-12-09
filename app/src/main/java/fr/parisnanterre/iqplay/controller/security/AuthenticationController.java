@@ -6,6 +6,8 @@ import fr.parisnanterre.iqplay.provider.JwtProvider;
 import fr.parisnanterre.iqplay.service.PlayerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -44,4 +46,25 @@ public class AuthenticationController {
             return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
         }
     }
+
+    @GetMapping("/test")
+    public ResponseEntity<?> isAuthenticated() {
+        // Récupère l'authentification depuis le SecurityContext
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal())) {
+            // L'utilisateur est authentifié
+            return ResponseEntity.ok(Map.of(
+                    "authenticated", true,
+                    "user", authentication.getName() // Renvoie le principal (par ex., email ou username)
+            ));
+        }
+
+        // L'utilisateur n'est pas authentifié
+        return ResponseEntity.ok(Map.of(
+                "authenticated", false,
+                "user", "anonymous"
+        ));
+    }
+
 }
