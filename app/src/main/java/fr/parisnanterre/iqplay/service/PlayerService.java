@@ -18,6 +18,14 @@ public class PlayerService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Enregistre un nouveau joueur dans la base de données.
+     *
+     * @param email L'email du joueur.
+     * @param username Le nom d'utilisateur du joueur.
+     * @param password Le mot de passe non encodé du joueur.
+     * @return Le joueur enregistré.
+     */
     public Player registerPlayer(String email, String username, String password) {
         if (email == null || username == null || password == null) {
             throw new IllegalArgumentException("Email, username, and password cannot be null.");
@@ -33,9 +41,27 @@ public class PlayerService {
         Player player = new Player();
         player.email(email);
         player.username(username);
-        player.password(passwordEncoder.encode(password));
+        player.password(passwordEncoder.encode(password)); // Encodage du mot de passe
 
         return playerRepository.save(player);
     }
 
+    /**
+     * Authentifie un joueur en vérifiant son email et son mot de passe.
+     *
+     * @param email L'email du joueur.
+     * @param password Le mot de passe non encodé fourni par l'utilisateur.
+     * @return Le joueur authentifié.
+     */
+    public Player authenticatePlayer(String email, String password) {
+        Player player = playerRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("No player found with this email."));
+
+        // Vérification du mot de passe
+        if (!passwordEncoder.matches(password, player.password())) {
+            throw new IllegalArgumentException("Invalid password.");
+        }
+
+        return player;
+    }
 }

@@ -1,9 +1,10 @@
 package fr.parisnanterre.iqplay.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import fr.parisnanterre.iqplay.Email;
 import fr.parisnanterre.iqplay.entity.api.IUser;
 
-public class PlayerRegistrationRequestDto implements IUser {
+public class PlayerRequestDto implements IUser {
 
     @JsonProperty
     private String email;
@@ -15,7 +16,7 @@ public class PlayerRegistrationRequestDto implements IUser {
     private String password;
 
     // No-args constructor (mandatory for Spring)
-    public PlayerRegistrationRequestDto() {}
+    public PlayerRequestDto() { }
 
     @Override
     public String email() {

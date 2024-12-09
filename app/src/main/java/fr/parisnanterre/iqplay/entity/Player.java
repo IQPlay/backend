@@ -8,7 +8,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import jakarta.persistence.*;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Entity
 public class Player implements IPlayer, IUser {
@@ -28,10 +27,9 @@ public class Player implements IPlayer, IUser {
 
     public Player() { }
 
-    public Player(String email, String username, String password) {
+    public Player(String email, String username) {
         this.email = email;
         this.username = username;
-        this.password = new BCryptPasswordEncoder().encode(password);
     }
 
     @Override
@@ -54,8 +52,16 @@ public class Player implements IPlayer, IUser {
 
     @Override
     public void password(String password) {
-        this.password = new BCryptPasswordEncoder().encode(password);
+        this.password = password;
     }
 
+    @Override
+    public String toString() {
+        return "Player{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", username='" + username + '\'' +
+                '}';
+    }
 }
 

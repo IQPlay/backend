@@ -1,5 +1,7 @@
 package fr.parisnanterre.iqplay.entity.api;
 
+import fr.parisnanterre.iqplay.Email;
+
 public interface IUser {
 
     String email();
