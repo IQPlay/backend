@@ -5,11 +5,11 @@ meta {
 }
 
 get {
-  url: http://localhost:8080/api/auth/test
+  url: https://localhost:8443/api/auth/test
   body: none
-  auth: bearer
+  auth: none
 }
 
-auth:bearer {
-  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzYW1pLmJhaGlqMUBnbWFpbC5jb20ifQ.-Ybe0rTXHZiEzSdEJnNrSV9LnEWNtIDR-P90R_bn84Y
+headers {
+  Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzYW1pLmJhaGlqMUBnbWFpbC5jb20ifQ.BzD2_Wj5YDOfO7oplqrejhC9qRVKpzrzf99DLfmaPac
 }

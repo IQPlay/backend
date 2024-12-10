@@ -7,4 +7,4 @@ build
 .DS_STORE
 .idea
 gradle.properties
-app/src/main/resources
+app/src/main/resources/application.properties
