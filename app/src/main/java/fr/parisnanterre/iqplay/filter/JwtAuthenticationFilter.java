@@ -5,6 +5,7 @@ import fr.parisnanterre.iqplay.service.JwtBlacklistService;
 import fr.parisnanterre.iqplay.service.PlayerDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,17 +33,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        String token = null;
         String authorizationHeader = request.getHeader("Authorization");
 
+        // Extraction du token depuis l'en-tête Authorization
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String token = authorizationHeader.substring(7);
+            token = authorizationHeader.substring(7);
+        } else {
+            // Extraction du token depuis le cookie "token"
+            if (request.getCookies() != null) {
+                for (Cookie cookie : request.getCookies()) {
+                    if ("token".equals(cookie.getName())) {
+                        token = cookie.getValue();
+                        break;
+                    }
+                }
+            }
+        }
 
+        if (token != null) {
+            // Vérification si le token est dans la blacklist
             if (jwtBlacklistService.isTokenBlacklisted(token)) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("Token is invalidated");
                 return;
             }
 
+            // Validation du token
             if (jwtProvider.validateToken(token)) {
                 String username = jwtProvider.getUsernameFromToken(token);
 
@@ -58,6 +75,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
-
-
 }
