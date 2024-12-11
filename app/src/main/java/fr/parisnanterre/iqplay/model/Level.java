@@ -1,6 +1,5 @@
-package fr.parisnanterre.iqplay.entity;
-
-import fr.parisnanterre.iqplaylib.api.ILevel;
+package fr.parisnanterre.iqplay.model;
+import fr.parisnanterre.iqplaylib.core.AbstractLevel;
 
 /**
  * Represents a level in a game, implementing the ILevel interface.
@@ -17,12 +16,12 @@ import fr.parisnanterre.iqplaylib.api.ILevel;
  *   <li>{@code levelDown()}: Decrements the current level by 1, but not below 1.</li>
  * </ul>
  */
-public class Level implements ILevel {
-    private int currentLevel = 1;
+public class Level extends AbstractLevel {
+    
+    private int currentLevel;
 
-    @Override
-    public void init() {
-        currentLevel = 1;
+    public Level(int currentLevel){
+        super(currentLevel);
     }
 
     @Override

@@ -79,7 +79,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter:3.4.0'
     implementation 'com.mysql:mysql-connector-j:9.1.0'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
-    implementation 'fr.parisnanterre:iqplaylib:0.2-SNAPSHOT-20'
+    implementation 'fr.parisnanterre:iqplaylib:0.2-SNAPSHOT-24'
 
     // JWT Dependencies
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'

@@ -1,7 +1,5 @@
 package fr.parisnanterre.iqplay.service;
 
-import fr.parisnanterre.iqplay.entity.Response;
-
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +8,7 @@ import java.util.Random;
 import fr.parisnanterre.iqplaylib.core.CorrectAnswer;
 import org.springframework.stereotype.Service;
 
+import fr.parisnanterre.iqplay.model.Response;
 import fr.parisnanterre.iqplaylib.api.*;
 import fr.parisnanterre.iqplaylib.core.Question;
 

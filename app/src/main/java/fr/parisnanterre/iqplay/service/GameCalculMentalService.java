@@ -1,11 +1,10 @@
 package fr.parisnanterre.iqplay.service;
 
-import fr.parisnanterre.iqplay.entity.GameSession;
-
 import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 
+import fr.parisnanterre.iqplay.model.GameSession;
 import fr.parisnanterre.iqplaylib.api.*;
 
 @Service

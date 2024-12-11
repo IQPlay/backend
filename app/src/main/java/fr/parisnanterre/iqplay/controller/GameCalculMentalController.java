@@ -1,9 +1,11 @@
 package fr.parisnanterre.iqplay.controller;
 
 import fr.parisnanterre.iqplay.dto.*;
-import fr.parisnanterre.iqplay.entity.GameCalculMental;
 import fr.parisnanterre.iqplay.entity.Player;
-import fr.parisnanterre.iqplay.entity.Response;
+import fr.parisnanterre.iqplay.model.GameCalculMental;
+import fr.parisnanterre.iqplay.model.Level;
+import fr.parisnanterre.iqplay.model.Response;
+import fr.parisnanterre.iqplay.model.Score;
 import fr.parisnanterre.iqplay.service.GameCalculMentalService;
 import fr.parisnanterre.iqplay.service.OperationService;
 import fr.parisnanterre.iqplaylib.api.*;
@@ -39,7 +41,7 @@ public class GameCalculMentalController {
         IPlayer player = new Player();
         IGame game = new GameCalculMental("Calcul Mental", operationService);
         IGameSession session = gameSessionService.createSession(player, game);
-        session.start();
+        session.start(new Level(1),new Score(0));
 
         Long sessionId = gameSessionService.getSessionId(session);
         return ResponseEntity.ok(new StartGameResponseDto(
