@@ -62,22 +62,23 @@ public class AuthenticationController {
 
     @GetMapping("/test")
     public ResponseEntity<?> isAuthenticated() {
-        // Récupère l'authentification depuis le SecurityContext
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+        System.out.println("Authentication: " + authentication);
         if (authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal())) {
-            // L'utilisateur est authentifié
+            System.out.println("User authenticated: " + authentication.getName());
             return ResponseEntity.ok(Map.of(
                     "authenticated", true,
                     "user", authentication.getName()
             ));
         }
-        // L'utilisateur n'est pas authentifié
+        System.out.println("User not authenticated");
         return ResponseEntity.ok(Map.of(
                 "authenticated", false,
                 "user", "anonymous"
         ));
     }
+
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
