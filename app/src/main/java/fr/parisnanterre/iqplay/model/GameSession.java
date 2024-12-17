@@ -37,8 +37,8 @@ public class GameSession extends AbstractGameSession {
     @Override
     public void start(ILevel level, IScore score) {
         this.state = StateGameSessionEnum.STARTED;
-        this.level = level;
-        this.score = score;
+        this.level = new Level(level.level());
+        this.score = new Score(score.score());
      }
     
     @Override
@@ -82,6 +82,10 @@ public class GameSession extends AbstractGameSession {
         }
     }
 
+    // remplacer par une fonction dans la biblio plus tard
+    public String name(){
+        return game.name();
+    }
     
 
 }

@@ -9,6 +9,9 @@ import fr.parisnanterre.iqplay.model.Score;
 import fr.parisnanterre.iqplay.service.GameCalculMentalService;
 import fr.parisnanterre.iqplay.service.OperationService;
 import fr.parisnanterre.iqplaylib.api.*;
+
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,18 +40,21 @@ public class GameCalculMentalController {
      * @return ResponseEntity containing the session ID.
      */
     @PostMapping("/start")
-    public ResponseEntity<StartGameResponseDto> startGame(@RequestBody StartGameRequestDto request) {
-        IPlayer player = new Player();
-        IGame game = new GameCalculMental("Calcul Mental", operationService);
-        IGameSession session = gameSessionService.createSession(player, game);
-        session.start(new Level(1),new Score(0));
-
-        Long sessionId = gameSessionService.getSessionId(session);
-        return ResponseEntity.ok(new StartGameResponseDto(
-                GameMessageEnum.SESSION_STARTED.message(),
-                sessionId
-        ));
+    public ResponseEntity<?> startGame(@RequestBody StartGameRequestDto request) {
+        try {
+            IPlayer player = new Player(); // Remplacez ceci par la récupération correcte du joueur
+            IGame game = new GameCalculMental("Calcul Mental", operationService);
+            IGameSession session = gameSessionService.createSession(player, game);
+            Long sessionId = gameSessionService.getSessionId(session);
+            return ResponseEntity.ok(new StartGameResponseDto(
+                    GameMessageEnum.SESSION_STARTED.message(),
+                    sessionId)
+                    );
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).body(Map.of("error", e.getMessage()));
+        }
     }
+
 
     /**
      * Retrieves the next operation for the specified session.

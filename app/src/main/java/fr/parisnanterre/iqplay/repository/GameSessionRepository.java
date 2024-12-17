@@ -1,6 +1,7 @@
 package fr.parisnanterre.iqplay.repository;
 
 import fr.parisnanterre.iqplay.entity.GameSessionPersistante;
+import fr.parisnanterre.iqplay.entity.Player;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,9 +17,12 @@ public interface GameSessionRepository extends JpaRepository<GameSessionPersista
     // Trouver des sessions créées après une certaine date
     List<GameSessionPersistante> findByCreatedAtAfter(LocalDateTime createdAt);
 
-    // Trouver des sessions dans une plage de dates
+    // Trouver des sessions créées dans une plage de dates
     List<GameSessionPersistante> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 
-    // Trouver des sessions associées à un jeu par son nom
-    List<GameSessionPersistante> findByGameName(String gameName);
+    // Trouver des sessions associées à un joueur
+    List<GameSessionPersistante> findByPlayer(Player player);
+
+    // Trouver des sessions associées à un joueur et un état spécifique
+    List<GameSessionPersistante> findByPlayerAndState(Player player, String state);
 }

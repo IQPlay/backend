@@ -23,7 +23,8 @@ public class GameSessionMapper {
      */
     public static GameSessionPersistante toPersistable(GameSession session, Player player) {
         return new GameSessionPersistante(
-            player,                               // Associe le joueur
+            player,     
+            session.name(),                         // Associe le joueur
             session.level().level(),              // Récupère le niveau actuel
             session.score().score(),              // Récupère le score actuel
             session.state().toString()            // Convertit l'état en chaîne
@@ -45,7 +46,19 @@ public class GameSessionMapper {
         // Relancer la partie au niveau enregistre
         session.start(level, score);
         
-
         return session;
+    }
+
+    /**
+     * Met à jour une instance persistante existante de GameSessionPersistante à partir d'une instance métier.
+     *
+     * @param session L'objet métier GameSession
+     * @param persistante L'entité persistante existante à mettre à jour
+     */
+    public static void updatePersistable(GameSession session, GameSessionPersistante persistante) {
+        persistante.setLevel(session.level().level());  // Met à jour le niveau
+        persistante.setScore(session.score().score());  // Met à jour le score
+        persistante.setState(session.state().toString()); // Met à jour l'état
+        // Ajoute d'autres champs si nécessaire
     }
 }
