@@ -5,11 +5,14 @@ meta {
 }
 
 post {
-  url: http://localhost:8080/api/game/start?difficulty=1
-  body: none
+  url: https://localhost:8443/api/game/start
+  body: json
   auth: none
 }
 
-params:query {
-  difficulty: 1
+body:json {
+  {
+    "difficulty": 1
+  }
+  
 }
