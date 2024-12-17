@@ -1,13 +1,11 @@
 package fr.parisnanterre.iqplay.controller;
 
 import fr.parisnanterre.iqplay.dto.*;
-import fr.parisnanterre.iqplay.entity.Player;
 import fr.parisnanterre.iqplay.model.GameCalculMental;
-import fr.parisnanterre.iqplay.model.Level;
 import fr.parisnanterre.iqplay.model.Response;
-import fr.parisnanterre.iqplay.model.Score;
 import fr.parisnanterre.iqplay.service.GameCalculMentalService;
 import fr.parisnanterre.iqplay.service.OperationService;
+import fr.parisnanterre.iqplay.service.PlayerService;
 import fr.parisnanterre.iqplaylib.api.*;
 
 import java.util.Map;
@@ -26,11 +24,14 @@ public class GameCalculMentalController {
 
     private final GameCalculMentalService gameSessionService;
     private final OperationService operationService;
+    private final PlayerService playerService;
 
     @Autowired
-    public GameCalculMentalController(GameCalculMentalService gameSessionService, OperationService operationService) {
+    public GameCalculMentalController(GameCalculMentalService gameSessionService, OperationService operationService, PlayerService playerService) {
         this.gameSessionService = gameSessionService;
         this.operationService = operationService;
+        this.playerService=playerService;
+        
     }
 
     /**
@@ -42,7 +43,7 @@ public class GameCalculMentalController {
     @PostMapping("/start")
     public ResponseEntity<?> startGame(@RequestBody StartGameRequestDto request) {
         try {
-            IPlayer player = new Player(); // Remplacez ceci par la récupération correcte du joueur
+            IPlayer player = playerService.getCurrentPlayer();
             IGame game = new GameCalculMental("Calcul Mental", operationService);
             IGameSession session = gameSessionService.createSession(player, game);
             Long sessionId = gameSessionService.getSessionId(session);
