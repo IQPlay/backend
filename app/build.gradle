@@ -112,7 +112,7 @@ java {
 }
 
 group = "fr.parisnanterre"
-version = "0.2"
+version = "0.3"
 
 application {
     mainClass = 'fr.parisnanterre.iqplay.App'
