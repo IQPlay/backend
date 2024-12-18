@@ -6,13 +6,15 @@
  */
 
 plugins {
-    // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
-    id 'jacoco' //pour les tests coverage
-    id "org.sonarqube" version "5.1.0.4882"
+    id 'org.springframework.boot' version '3.4.0'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'jacoco'
+    id 'org.sonarqube' version '5.1.0.4882'
     id 'org.asciidoctor.jvm.convert' version '4.0.2'
     id 'org.asciidoctor.jvm.pdf' version '4.0.2'
 }
+
 asciidoctor {
     sourceDir = file('src/docs')
     outputDir = file("${buildDir}/docs")
@@ -29,7 +31,6 @@ asciidoctorj {
         'source-highlighter': 'rouge',
         'rouge-style': 'github',
         'rouge-theme': 'github'
-        
 }
 
 asciidoctorPdf {
@@ -37,31 +38,31 @@ asciidoctorPdf {
     outputDir = file("${buildDir}/docs")
 }
 
+jacoco {
+    toolVersion = "0.8.12"
+}
 
-jacoco{
-    toolVersion = "0.8.12" // jacoco version, denpendance de compilation
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
-test{
-    useJUnitPlatform() //pour les tests
-    finalizedBy jacocoTestReport //pour les tests coverage
-}
-jacocoTestReport{
-    reports{
-        xml.required.set(true) //pour les tests coverage
-        html.required.set(true) //pour les tests coverage
+
+jacocoTestReport {
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
     }
 }
 
 sonar {
-  properties {
-    property "sonar.projectKey", "IQPlay_backend"
-    property "sonar.organization", "iqplay"
-    property "sonar.host.url", "https://sonarcloud.io"
-  }
+    properties {
+        property "sonar.projectKey", "IQPlay_backend"
+        property "sonar.organization", "iqplay"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
 }
 
 repositories {
-    // Use Maven Central for resolving dependencies.
     mavenCentral()
     maven {
         url = uri("https://maven.pkg.github.com/IQPlay/library/")
@@ -73,13 +74,34 @@ repositories {
 }
 
 dependencies {
-    // Use JUnit test framework.
-    testImplementation libs.junit
+    // Spring Boot Starters
+    implementation 'org.springframework.boot:spring-boot-starter-security:3.4.0'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.4.0'
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.4.0'
+    implementation 'org.springframework.boot:spring-boot-starter:3.4.0'
 
-    implementation 'org.springframework.boot:spring-boot-starter-web:3.3.3'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.3.3'
+    // MySQL Connector
+    implementation 'com.mysql:mysql-connector-j:9.1.0'
+
+    // JSON Processing
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+
+    // External IQPlay Library
+    implementation 'fr.parisnanterre:iqplaylib:0.2-SNAPSHOT-25'
+
+    // JWT Dependencies
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // Apache Commons
     implementation 'org.apache.commons:commons-jexl3:3.2'
-    implementation 'fr.parisnanterre:iqplaylib:0.2'
+
+    // Testing Dependencies
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.4.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'org.mockito:mockito-core:5.11.0'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test' // MockMvc inclus ici
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -89,19 +111,13 @@ java {
     }
 }
 
-//NOUS AVONS AJOUTE CE CODE
-group = "fr.parisNanterre.DigiMenu-Orga" // defini le nom du package
-//artefact c'est le meme nom que le nom du projet
-version = "0.2.0"
+group = "fr.parisnanterre"
+version = "0.2"
 
 application {
-    // Define the main class for the application.
-    mainClass = 'fr.parisNanterre.iqPlay.App' //on renomme le nom du package
-    
-    
+    mainClass = 'fr.parisnanterre.iqplay.App'
 }
 
-// edit the build task to generate the asciidoc pdf too
 tasks.named('asciidoctor').configure {
     dependsOn tasks.named('asciidoctorPdf')
 }

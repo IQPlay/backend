@@ -1,0 +1,19 @@
+meta {
+  name: Log a user
+  type: http
+  seq: 2
+}
+
+post {
+  url: https://localhost:8443/api/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "sami.bahij1@gmail.c",
+    "password": "Bahij78300!"
+  }
+  
+}

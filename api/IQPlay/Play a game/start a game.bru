@@ -1,0 +1,18 @@
+meta {
+  name: start a game
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://localhost:8443/api/game/start
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "difficulty": 1
+  }
+  
+}

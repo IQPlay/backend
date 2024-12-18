@@ -1,0 +1,15 @@
+meta {
+  name: stop a game
+  type: http
+  seq: 4
+}
+
+post {
+  url: https://localhost:8443/api/game/stop/2
+  body: none
+  auth: none
+}
+
+docs {
+  /api/game/stop/{sessionId}
+}

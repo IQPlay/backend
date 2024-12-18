@@ -1,0 +1,15 @@
+meta {
+  name: Test User auth
+  type: http
+  seq: 3
+}
+
+get {
+  url: https://localhost:8443/api/auth/test
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzYW1pLmJhaGlqMUBnbWFpbC5jIn0.LLGNI7nWTcVJBBY29JbvroWoJcmTwSIma6l5EtaHkv4
+}
