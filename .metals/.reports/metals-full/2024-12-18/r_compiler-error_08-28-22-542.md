@@ -1,6 +1,22 @@
+file:///C:/Users/mathi/Documents/github/IQPLay/backend/app/src/main/java/fr/parisnanterre/iqplay/service/GameCalculMentalService.java
+### java.util.NoSuchElementException: next on empty iterator
+
+occurred in the presentation compiler.
+
+presentation compiler configuration:
+
+
+action parameters:
+uri: file:///C:/Users/mathi/Documents/github/IQPLay/backend/app/src/main/java/fr/parisnanterre/iqplay/service/GameCalculMentalService.java
+text:
+```scala
 package fr.parisnanterre.iqplay.service;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,34 +121,22 @@ public class GameCalculMentalService implements IGameSessionService {
         }
     }
 
-    public GameStopResponseDto endSession(Long sessionId) {
-    // Trouve la session active ou chargée depuis la base
-    GameSession session = (GameSession) findSession(sessionId);
+    @PostMapping("/stop/{sessionId}")
+public ResponseEntity<GameStopResponseDto> stopGame(@PathVariable Long sessionId) {
+    // Trouve la session
+    IGameSession session = gameSessionService.findSession(sessionId);
 
-    // Vérifie si la session existe
-    if (session == null) {
-        throw new IllegalArgumentException("Session non trouvée.");
+    // Valide la session via validateSession
+    ResponseEntity<GameStopResponseDto> validationResponse = validateSession(session);
+    if (validationResponse != null) {
+        return ResponseEntity.status(validationResponse.getStatusCode()).body(validationResponse.getBody());
     }
 
-    // Vérifie si la session est déjà terminée
-    if (session.state() == StateGameSessionEnum.ENDED) {
-        throw new IllegalStateException("La session est déjà terminée.");
-    }
+    // Termine la session en appelant le service
+    GameStopResponseDto response = gameSessionService.endSession(sessionId);
 
-    // Termine la session
-    session.end();
-
-    // Synchronise l'état de la session en base de données
-    synchronizeSession(sessionId);
-
-    // Supprime la session terminée de la map des sessions actives
-    activeSessions.remove(sessionId);
-    // Retourne une réponse avec les informations de fin de session
-    return new GameStopResponseDto(
-            GameMessageEnum.GAME_STOPPED.message(),
-            session.score().score(),
-            session.state().name()
-    );
+    // Retourne une réponse avec succès
+    return ResponseEntity.ok(response);
 }
 
 
@@ -143,3 +147,30 @@ public class GameCalculMentalService implements IGameSessionService {
         return gameSessionRepository.findByPlayer(player);
     }
 }
+
+```
+
+
+
+#### Error stacktrace:
+
+```
+scala.collection.Iterator$$anon$19.next(Iterator.scala:973)
+	scala.collection.Iterator$$anon$19.next(Iterator.scala:971)
+	scala.collection.mutable.MutationTracker$CheckedIterator.next(MutationTracker.scala:76)
+	scala.collection.IterableOps.head(Iterable.scala:222)
+	scala.collection.IterableOps.head$(Iterable.scala:222)
+	scala.collection.AbstractIterable.head(Iterable.scala:935)
+	dotty.tools.dotc.interactive.InteractiveDriver.run(InteractiveDriver.scala:164)
+	dotty.tools.pc.MetalsDriver.run(MetalsDriver.scala:45)
+	dotty.tools.pc.WithCompilationUnit.<init>(WithCompilationUnit.scala:31)
+	dotty.tools.pc.SimpleCollector.<init>(PcCollector.scala:345)
+	dotty.tools.pc.PcSemanticTokensProvider$Collector$.<init>(PcSemanticTokensProvider.scala:63)
+	dotty.tools.pc.PcSemanticTokensProvider.Collector$lzyINIT1(PcSemanticTokensProvider.scala:63)
+	dotty.tools.pc.PcSemanticTokensProvider.Collector(PcSemanticTokensProvider.scala:63)
+	dotty.tools.pc.PcSemanticTokensProvider.provide(PcSemanticTokensProvider.scala:88)
+	dotty.tools.pc.ScalaPresentationCompiler.semanticTokens$$anonfun$1(ScalaPresentationCompiler.scala:109)
+```
+#### Short summary: 
+
+java.util.NoSuchElementException: next on empty iterator
