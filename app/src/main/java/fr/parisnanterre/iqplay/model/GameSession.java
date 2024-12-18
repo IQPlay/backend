@@ -1,4 +1,4 @@
-package fr.parisnanterre.iqplay.entity;
+package fr.parisnanterre.iqplay.model;
 
 import fr.parisnanterre.iqplay.service.OperationService;
 
@@ -35,15 +35,12 @@ public class GameSession extends AbstractGameSession {
     }
 
     @Override
-    protected ILevel createLevel() {
-        return new Level(); // Retourne une instance de votre classe Level
-    }
-
-    @Override
-    protected IScore createScore() {
-        return new Score(); // Retourne une instance de votre classe Score
-    }
-
+    public void start(ILevel level, IScore score) {
+        this.state = StateGameSessionEnum.STARTED;
+        this.level = new Level(level.level());
+        this.score = new Score(score.score());
+     }
+    
     @Override
     protected IQuestionStorageSession createQuestionStorageSession() {
         return new QuestionStorageSession(); // Utilise QuestionStorageSession
@@ -84,5 +81,11 @@ public class GameSession extends AbstractGameSession {
             onIncorrectAnswer();
         }
     }
+
+    // remplacer par une fonction dans la biblio plus tard
+    public String name(){
+        return game.name();
+    }
+    
 
 }

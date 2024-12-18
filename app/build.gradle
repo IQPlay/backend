@@ -14,6 +14,7 @@ plugins {
     id 'org.asciidoctor.jvm.convert' version '4.0.2'
     id 'org.asciidoctor.jvm.pdf' version '4.0.2'
 }
+
 asciidoctor {
     sourceDir = file('src/docs')
     outputDir = file("${buildDir}/docs")
@@ -30,7 +31,6 @@ asciidoctorj {
         'source-highlighter': 'rouge',
         'rouge-style': 'github',
         'rouge-theme': 'github'
-        
 }
 
 asciidoctorPdf {
@@ -38,27 +38,28 @@ asciidoctorPdf {
     outputDir = file("${buildDir}/docs")
 }
 
-
-jacoco{
+jacoco {
     toolVersion = "0.8.12"
 }
-test{
+
+test {
     useJUnitPlatform()
     finalizedBy jacocoTestReport
 }
-jacocoTestReport{
-    reports{
+
+jacocoTestReport {
+    reports {
         xml.required.set(true)
         html.required.set(true)
     }
 }
 
 sonar {
-  properties {
-    property "sonar.projectKey", "IQPlay_backend"
-    property "sonar.organization", "iqplay"
-    property "sonar.host.url", "https://sonarcloud.io"
-  }
+    properties {
+        property "sonar.projectKey", "IQPlay_backend"
+        property "sonar.organization", "iqplay"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
 }
 
 repositories {
@@ -73,23 +74,35 @@ repositories {
 }
 
 dependencies {
+    // Spring Boot Starters
     implementation 'org.springframework.boot:spring-boot-starter-security:3.4.0'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.4.0'
     implementation 'org.springframework.boot:spring-boot-starter-web:3.4.0'
     implementation 'org.springframework.boot:spring-boot-starter:3.4.0'
+
+    // MySQL Connector
     implementation 'com.mysql:mysql-connector-j:9.1.0'
+
+    // JSON Processing
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
-    implementation 'fr.parisnanterre:iqplaylib:0.2-SNAPSHOT-20'
+
+    // External IQPlay Library
+    implementation 'fr.parisnanterre:iqplaylib:0.2-SNAPSHOT-25'
 
     // JWT Dependencies
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.3.3'
+    // Apache Commons
     implementation 'org.apache.commons:commons-jexl3:3.2'
-}
 
+    // Testing Dependencies
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.4.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'org.mockito:mockito-core:5.11.0'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test' // MockMvc inclus ici
+}
 
 // Apply a specific Java toolchain to ease working on different environments.
 java {

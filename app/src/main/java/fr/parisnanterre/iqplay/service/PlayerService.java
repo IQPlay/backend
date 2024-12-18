@@ -2,7 +2,10 @@ package fr.parisnanterre.iqplay.service;
 
 import fr.parisnanterre.iqplay.entity.Player;
 import fr.parisnanterre.iqplay.repository.PlayerRepository;
+import fr.parisnanterre.iqplaylib.api.IPlayer;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,7 +27,7 @@ public class PlayerService {
     /**
      * Enregistre un nouveau joueur dans la base de données.
      *
-     * @param email L'email du joueur.
+     * @param email    L'email du joueur.
      * @param username Le nom d'utilisateur du joueur.
      * @param password Le mot de passe non encodé du joueur.
      * @return Le joueur enregistré.
@@ -44,7 +47,7 @@ public class PlayerService {
         Player player = new Player();
         player.email(email);
         player.username(username);
-        player.password(passwordEncoder.encode(password)); // Encodage du mot de passe
+        player.password(passwordEncoder.encode(password));
 
         return playerRepository.save(player);
     }
@@ -52,7 +55,7 @@ public class PlayerService {
     /**
      * Authentifie un joueur en vérifiant son email et son mot de passe.
      *
-     * @param email L'email du joueur.
+     * @param email    L'email du joueur.
      * @param password Le mot de passe non encodé fourni par l'utilisateur.
      * @return Le joueur authentifié.
      */
@@ -60,7 +63,6 @@ public class PlayerService {
         Player player = playerRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("No player found with this email."));
 
-        // Vérification du mot de passe
         if (!passwordEncoder.matches(password, player.password())) {
             throw new IllegalArgumentException("Invalid password.");
         }
@@ -68,14 +70,33 @@ public class PlayerService {
         return player;
     }
 
+    /**
+     * Récupère le joueur actuellement authentifié.
+     *
+     * @return Le joueur actuellement connecté.
+     */
+    public IPlayer getCurrentPlayer() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal())) {
+            throw new IllegalStateException("No authenticated player found.");
+        }
+
+        String username = authentication.getName(); // Supposant que l'email est utilisé comme principal
+        return playerRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalStateException("Authenticated player not found in database."));
+    }
+
+    /**
+     * Invalide un token JWT et déconnecte le joueur.
+     *
+     * @param token Le token à invalider.
+     */
     public void logout(String token) {
         if (token == null || token.isEmpty()) {
             throw new IllegalArgumentException("Token must not be null or empty.");
         }
-        // Ajoute le token à la liste de révocation
         jwtBlacklistService.invalidateToken(token);
-        // Efface le SecurityContext actuel
         SecurityContextHolder.clearContext();
     }
-
 }

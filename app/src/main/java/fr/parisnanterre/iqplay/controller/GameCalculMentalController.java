@@ -1,12 +1,15 @@
 package fr.parisnanterre.iqplay.controller;
 
 import fr.parisnanterre.iqplay.dto.*;
-import fr.parisnanterre.iqplay.entity.GameCalculMental;
-import fr.parisnanterre.iqplay.entity.Player;
-import fr.parisnanterre.iqplay.entity.Response;
+import fr.parisnanterre.iqplay.model.GameCalculMental;
+import fr.parisnanterre.iqplay.model.Response;
 import fr.parisnanterre.iqplay.service.GameCalculMentalService;
 import fr.parisnanterre.iqplay.service.OperationService;
+import fr.parisnanterre.iqplay.service.PlayerService;
 import fr.parisnanterre.iqplaylib.api.*;
+
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,11 +24,14 @@ public class GameCalculMentalController {
 
     private final GameCalculMentalService gameSessionService;
     private final OperationService operationService;
+    private final PlayerService playerService;
 
     @Autowired
-    public GameCalculMentalController(GameCalculMentalService gameSessionService, OperationService operationService) {
+    public GameCalculMentalController(GameCalculMentalService gameSessionService, OperationService operationService, PlayerService playerService) {
         this.gameSessionService = gameSessionService;
         this.operationService = operationService;
+        this.playerService=playerService;
+        
     }
 
     /**
@@ -35,18 +41,21 @@ public class GameCalculMentalController {
      * @return ResponseEntity containing the session ID.
      */
     @PostMapping("/start")
-    public ResponseEntity<StartGameResponseDto> startGame(@RequestBody StartGameRequestDto request) {
-        IPlayer player = new Player();
-        IGame game = new GameCalculMental("Calcul Mental", operationService);
-        IGameSession session = gameSessionService.createSession(player, game);
-        session.start();
-
-        Long sessionId = gameSessionService.getSessionId(session);
-        return ResponseEntity.ok(new StartGameResponseDto(
-                GameMessageEnum.SESSION_STARTED.message(),
-                sessionId
-        ));
+    public ResponseEntity<?> startGame(@RequestBody StartGameRequestDto request) {
+        try {
+            IPlayer player = playerService.getCurrentPlayer();
+            IGame game = new GameCalculMental("Calcul Mental", operationService);
+            IGameSession session = gameSessionService.createSession(player, game);
+            Long sessionId = gameSessionService.getSessionId(session);
+            return ResponseEntity.ok(new StartGameResponseDto(
+                    GameMessageEnum.SESSION_STARTED.message(),
+                    sessionId)
+                    );
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).body(Map.of("error", e.getMessage()));
+        }
     }
+
 
     /**
      * Retrieves the next operation for the specified session.
@@ -126,19 +135,22 @@ public class GameCalculMentalController {
      */
     @PostMapping("/stop/{sessionId}")
     public ResponseEntity<GameStopResponseDto> stopGame(@PathVariable Long sessionId) {
+        // Trouve la session
         IGameSession session = gameSessionService.findSession(sessionId);
+
+        // Valide la session via validateSession
         ResponseEntity<GameStopResponseDto> validationResponse = validateSession(session);
         if (validationResponse != null) {
             return ResponseEntity.status(validationResponse.getStatusCode()).body(validationResponse.getBody());
         }
 
-        session.end();
-        return ResponseEntity.ok(new GameStopResponseDto(
-                GameMessageEnum.GAME_STOPPED.message(),
-                session.score().score(),
-                "ENDED"
-        ));
-    }
+        // Termine la session en appelant le service
+        GameStopResponseDto response = gameSessionService.endSession(sessionId);
+
+        // Retourne une réponse avec succès
+        return ResponseEntity.ok(response);
+}
+
 
     /**
      * Validates the session existence and state.

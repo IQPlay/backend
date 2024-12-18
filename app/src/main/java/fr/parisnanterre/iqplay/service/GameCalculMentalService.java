@@ -1,77 +1,145 @@
 package fr.parisnanterre.iqplay.service;
 
-import fr.parisnanterre.iqplay.entity.GameSession;
-
 import org.springframework.stereotype.Service;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 import java.util.Map;
 
+import fr.parisnanterre.iqplay.mapper.GameSessionMapper;
+import fr.parisnanterre.iqplay.model.GameCalculMental;
+import fr.parisnanterre.iqplay.model.GameSession;
+import fr.parisnanterre.iqplay.dto.GameStopResponseDto;
+import fr.parisnanterre.iqplay.entity.GameSessionPersistante;
+import fr.parisnanterre.iqplay.entity.Player;
+import fr.parisnanterre.iqplay.repository.GameSessionRepository;
+import fr.parisnanterre.iqplay.model.Level;
+import fr.parisnanterre.iqplay.model.Score;
 import fr.parisnanterre.iqplaylib.api.*;
 
 @Service
 public class GameCalculMentalService implements IGameSessionService {
-    private final Map<Long, IGameSession> sessions = new HashMap<>();
-    private long nextId = 1;
-
+    private final Map<Long, GameSession> activeSessions = new ConcurrentHashMap<>();
     private final OperationService operationService;
+    private final GameSessionRepository gameSessionRepository;
 
-    /**
-     * Service class for managing mental calculation game sessions.
-     * Implements the IGameSessionService interface to provide functionality
-     * for creating, retrieving, and managing game sessions.
-     *
-     * <p>Uses the OperationService to generate mathematical operations for
-     * game sessions. Maintains a map of sessions identified by unique IDs.</p>
-     *
-     * @param operationService The service used to generate operations for questions.
-     */
-    public GameCalculMentalService(OperationService operationService) {
+    public GameCalculMentalService(OperationService operationService, GameSessionRepository gameSessionRepository) {
         this.operationService = operationService;
+        this.gameSessionRepository = gameSessionRepository;
     }
 
     /**
-     * Creates a new game session for the specified player and game.
-     * Initializes the session using the provided game and the operation service,
-     * and stores it in the sessions map with a unique ID.
-     *
-     * @param player The player for whom the session is created.
-     * @param game The game instance associated with the session.
-     * @return The newly created game session.
+     * Starts a new game session.
+     * 
+     * @return The ID of the session that has been persisted.
+     */
+    public Long startSession() {
+        IPlayer player = new Player();
+        IGame game = new GameCalculMental("Calcul Mental", operationService);
+
+        // Create the session
+        IGameSession session = createSession(player, game);
+
+        // Initialize session with default level and score
+        session.start(new Level(1), new Score(0));
+
+        // Return the session ID
+        return getSessionId(session);
+    }
+
+    /**
+     * Creates a new session for a player and game, persists it, and adds it to memory.
      */
     @Override
     public IGameSession createSession(IPlayer player, IGame game) {
-        IGameSession session = new GameSession(game, operationService);
-        sessions.put(nextId++, session);
+        GameSession session = new GameSession(game, operationService);
+
+        // Ensure the session is initialized with default level and score
+        session.start(new Level(1), new Score(0));
+
+        // Map to a persistable entity and save to database
+        GameSessionPersistante persistante = GameSessionMapper.toPersistable(session, (fr.parisnanterre.iqplay.entity.Player) player);
+        GameSessionPersistante savedEntity = gameSessionRepository.save(persistante);
+
+        // Store in memory
+        activeSessions.put(savedEntity.getId(), session);
+
         return session;
     }
 
-    /**
-     * Retrieves a game session by its unique session ID.
-     *
-     * @param sessionId The unique identifier of the session to retrieve.
-     * @return The game session associated with the given session ID, or null if no session is found.
-     */
     @Override
     public IGameSession findSession(Long sessionId) {
-        return sessions.get(sessionId);
+        GameSession session = activeSessions.get(sessionId);
+        if (session != null) {
+            return session;
+        }
+
+        return gameSessionRepository.findById(sessionId)
+                .map(persistante -> {
+                    GameSession loadedSession = GameSessionMapper.toDomain(
+                            new GameCalculMental("Calcul Mental", operationService), 
+                            persistante, 
+                            operationService
+                    );
+                    activeSessions.put(sessionId, loadedSession);
+                    return loadedSession;
+                })
+                .orElse(null);
     }
 
-    /**
-     * Retrieves the unique session ID associated with the given game session.
-     * Iterates through the stored sessions to find a match with the provided session object.
-     *
-     * @param session The game session for which the ID is to be retrieved.
-     * @return The unique ID of the session, or null if no matching session is found.
-     */
     @Override
     public Long getSessionId(IGameSession session) {
-        // Parcourt les sessions pour trouver la correspondance avec l'objet session
-        return sessions.entrySet().stream()
+        return activeSessions.entrySet().stream()
                 .filter(entry -> entry.getValue().equals(session))
                 .map(Map.Entry::getKey)
                 .findFirst()
-                .orElse(null); // Retourne null si aucune correspondance
+                .orElse(null);
     }
 
+    public void synchronizeSession(Long sessionId) {
+        GameSession session = activeSessions.get(sessionId);
+        if (session != null) {
+            gameSessionRepository.findById(sessionId).ifPresent(persistante -> {
+                GameSessionMapper.updatePersistable(session, persistante);
+                gameSessionRepository.save(persistante);
+            });
+        }
+    }
+
+    public GameStopResponseDto endSession(Long sessionId) {
+    // Trouve la session active ou chargée depuis la base
+    GameSession session = (GameSession) findSession(sessionId);
+
+    // Vérifie si la session existe
+    if (session == null) {
+        throw new IllegalArgumentException("Session non trouvée.");
+    }
+
+    // Vérifie si la session est déjà terminée
+    if (session.state() == StateGameSessionEnum.ENDED) {
+        throw new IllegalStateException("La session est déjà terminée.");
+    }
+
+    // Termine la session
+    session.end();
+
+    // Synchronise l'état de la session en base de données
+    synchronizeSession(sessionId);
+
+    // Supprime la session terminée de la map des sessions actives
+    activeSessions.remove(sessionId);
+    // Retourne une réponse avec les informations de fin de session
+    return new GameStopResponseDto(
+            GameMessageEnum.GAME_STOPPED.message(),
+            session.score().score(),
+            session.state().name()
+    );
 }
 
+
+    public List<GameSessionPersistante> getSessionsByPlayer(IPlayer player) {
+        if (player == null) {
+            throw new IllegalArgumentException("Player cannot be null.");
+        }
+        return gameSessionRepository.findByPlayer(player);
+    }
+}

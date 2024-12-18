@@ -1,4 +1,4 @@
-package fr.parisnanterre.iqplay.entity;
+package fr.parisnanterre.iqplay.model;
 
 import fr.parisnanterre.iqplaylib.api.ICorrectAnswer;
 import fr.parisnanterre.iqplaylib.api.IQuestion;

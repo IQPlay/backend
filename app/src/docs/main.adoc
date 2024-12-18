@@ -12,73 +12,175 @@ plantuml::src/docs/model/archi.puml[format=svg]
 
 == Routes
 
-=== 1. Démarrer une session de jeu
-*URL* : `http://localhost:8080/api/game/start?difficulty=3`
+= API Documentation
 
-*Méthode* : `GET`
+== Présentation du Projet
+Ce projet a été développé par [Nom du Groupe/Équipe] dans le cadre de [nom du cours ou du projet].
+Il s'agit d'une API REST pour la gestion des sessions de calcul mental et des données des joueurs.
 
-*Paramètres* :
-- `difficulty` : Niveau de difficulté (1 à n), type `int`.
+== Routes de l'API
 
-*Réponse* :
-{ "message": "Session démarrée avec succès.", "sessionId": "6878712f-d9ba-4b92-92a3-b12c7aae0b63" }
+=== Routes pour les Jeux
 
-*Explication* :
-Cette route permet de démarrer une nouvelle session de jeu en fonction du niveau de difficulté choisi. Elle retourne un `sessionId` que vous utiliserez pour toutes les requêtes suivantes liées à cette session.
+==== Démarrer une nouvelle session de jeu
+[options="header"]
+POST /api/game/start
 
-=== 2. Obtenir une opération à résoudre
-*URL* : `http://localhost:8080/api/game/operation/{sessionId}`
+**Description :**
+Cette route permet de démarrer une nouvelle session de jeu avec un niveau de difficulté spécifié.
 
-*Méthode* : `GET`
+.Request Body
+[source,json]
+----
+{
+  "difficulty": "string" // Spécifiez le niveau de difficulté (facile, moyen, difficile).
+}
+----
 
-*Paramètres* :
-- `{sessionId}` : ID de la session obtenue lors du démarrage, type `string`.
+.Response Example (200 OK)
+[source,json]
+----
+{
+  "message": "SESSION_STARTED",
+  "sessionId": 12345
+}
+----
 
-*Réponse* :
-{ "expression": "20 * 3 - 3 * 7", "result": 39 }
+==== Récupérer la prochaine opération
+[options="header"]
+GET /api/game/operation/{sessionId}
 
-*Explication* :
-Cette route renvoie une opération mathématique aléatoire à résoudre ainsi que le résultat de l'expression pour référence interne.
+**Description :**
+Cette route renvoie l'opération suivante dans une session de jeu spécifiée.
 
-=== 3. Soumettre une réponse à une opération
-*URL* : `http://localhost:8080/api/game/answer/{sessionId}?userAnswer={userAnswer}`
+.Path Parameters
+- `sessionId` (requis) : L'identifiant unique de la session de jeu.
 
-*Méthode* : `GET`
+.Response Example (200 OK)
+[source,json]
+----
+{
+  "message": null,
+  "operation": "5 + 3",
+  "status": "READY"
+}
+----
 
-*Paramètres* :
-- `{sessionId}` : ID de la session de jeu, type `string`.
-- `userAnswer` : La réponse donnée par l'utilisateur à l'opération, type `int`.
+==== Soumettre une réponse
+[options="header"]
+POST /api/game/answer/{sessionId}
 
-*Réponse* :
-{ "feedback": "Réponse incorrecte ! Le résultat est : 56", "gameStatus": "IN_PROGRESS" }
+**Description :**
+Cette route permet au joueur de soumettre une réponse pour l'opération actuelle dans une session de jeu.
 
-*Explication* :
-Cette route permet à l'utilisateur de soumettre sa réponse. Le serveur vérifie la validité de la réponse et renvoie un retour (correct ou incorrect), ainsi que le statut du jeu.
+.Path Parameters
+- `sessionId` (requis) : L'identifiant unique de la session de jeu.
 
-=== 4. Continuer la partie
-*URL* : `http://localhost:8080/api/game/continue/{sessionId}`
+.Request Body
+[source,json]
+----
+{
+  "userAnswer": 8 // Réponse soumise par le joueur.
+}
+----
 
-*Méthode* : `GET`
+.Response Example (200 OK)
+[source,json]
+----
+{
+  "message": "ANSWER_CORRECT",
+  "score": 10,
+  "status": "IN_PROGRESS",
+  "nextOperation": "2 * 6"
+}
+----
 
-*Paramètres* :
-- `{sessionId}` : ID de la session de jeu, type `string`.
+==== Arrêter une session de jeu
+[options="header"]
+POST /api/game/stop/{sessionId}
 
-*Réponse* :
-Difficulté mise à jour. Nouvelles opérations générées.
+**Description :**
+Cette route met fin à une session de jeu en cours et retourne les informations finales.
 
-*Explication* :
-Cette route permet de continuer le jeu en mettant à jour la difficulté et en générant de nouvelles opérations pour l'utilisateur.
+.Path Parameters
+- `sessionId` (requis) : L'identifiant unique de la session de jeu.
 
-=== 5. Arrêter et terminer une session
-*URL* : `http://localhost:8080/api/game/stop/{sessionId}`
+.Response Example (200 OK)
+[source,json]
+----
+{
+  "message": "GAME_STOPPED",
+  "score": 25,
+  "status": "ENDED"
+}
+----
 
-*Méthode* : `GET`
+=== Routes pour les Joueurs
 
-*Paramètres* :
-- `{sessionId}` : ID de la session de jeu, type `string`.
+==== Profil du joueur
+[options="header"]
+GET /api/player/profile
 
-*Réponse* :
-Session terminée et supprimée en mémoire. Le jeu est arrêté.
+**Description :**
+Cette route retourne les informations du profil du joueur actuellement connecté.
 
-*Explication* :
-Cette route termine la session de jeu et supprime toutes les données associées. Le jeu s'arrête et l'utilisateur ne pourra plus soumettre de réponses ou d'actions jusqu'à ce qu'une nouvelle session soit démarrée.
+.Response Example (200 OK)
+[source,json]
+----
+{
+  "id": 1,
+  "email": "player@example.com",
+  "username": "player1"
+}
+----
+
+==== Statistiques du joueur
+[options="header"]
+GET /api/player/statistics
+
+**Description :**
+Cette route fournit les statistiques du joueur, y compris le nombre total de parties, le score moyen et le meilleur score.
+
+.Response Example (200 OK)
+[source,json]
+----
+{
+  "totalGames": 5,
+  "averageScore": 12.4,
+  "bestScore": 20
+}
+----
+
+==== Historique des parties du joueur
+[options="header"]
+GET /api/player/history
+
+**Description :**
+Cette route retourne l'historique des parties du joueur, y compris les parties terminées et celles en cours.
+
+.Response Example (200 OK)
+[source,json]
+----
+{
+  "finishedGames": [
+    {
+      "id": 101,
+      "name": "Calcul Mental",
+      "level": 2,
+      "score": 15,
+      "state": "ENDED",
+      "createdAt": "2023-12-01T10:00:00Z"
+    }
+  ],
+  "currentGames": [
+    {
+      "id": 102,
+      "name": "Calcul Mental",
+      "level": 1,
+      "score": 5,
+      "state": "STARTED",
+      "createdAt": "2023-12-01T12:00:00Z"
+    }
+  ]
+}
+----
