@@ -82,8 +82,8 @@ public class PlayerService {
             throw new IllegalStateException("No authenticated player found.");
         }
 
-        String email = authentication.getName(); // Supposant que l'email est utilisé comme principal
-        return playerRepository.findByEmail(email)
+        String username = authentication.getName(); // Supposant que l'email est utilisé comme principal
+        return playerRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalStateException("Authenticated player not found in database."));
     }
 
