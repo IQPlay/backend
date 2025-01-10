@@ -1,6 +1,7 @@
 package fr.parisnanterre.iqplay.controller;
 
 import fr.parisnanterre.iqplay.dto.*;
+import fr.parisnanterre.iqplay.exception.UnauthorizedException;
 import fr.parisnanterre.iqplay.model.GameCalculMental;
 import fr.parisnanterre.iqplay.model.Response;
 import fr.parisnanterre.iqplay.service.GameCalculMentalService;
@@ -11,6 +12,7 @@ import fr.parisnanterre.iqplaylib.api.*;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,21 +43,25 @@ public class GameCalculMentalController {
      * @return ResponseEntity containing the session ID.
      */
     @PostMapping("/start")
-    public ResponseEntity<?> startGame(@RequestBody StartGameRequestDto request) {
+    public ResponseEntity<StartGameResponseDto> startGame(@RequestBody StartGameRequestDto request) {
         try {
             IPlayer player = playerService.getCurrentPlayer();
+
             IGame game = new GameCalculMental("Calcul Mental", operationService);
             IGameSession session = gameSessionService.createSession(player, game);
+
             Long sessionId = gameSessionService.getSessionId(session);
             return ResponseEntity.ok(new StartGameResponseDto(
                     GameMessageEnum.SESSION_STARTED.message(),
-                    sessionId)
-                    );
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(400).body(Map.of("error", e.getMessage()));
+                    sessionId
+            ));
+        } catch (UnauthorizedException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StartGameResponseDto(
+                    ex.getMessage(),
+                    null
+            ));
         }
     }
-
 
     /**
      * Retrieves the next operation for the specified session.

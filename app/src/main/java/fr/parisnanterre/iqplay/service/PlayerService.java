@@ -1,6 +1,7 @@
 package fr.parisnanterre.iqplay.service;
 
 import fr.parisnanterre.iqplay.entity.Player;
+import fr.parisnanterre.iqplay.exception.UnauthorizedException;
 import fr.parisnanterre.iqplay.repository.PlayerRepository;
 import fr.parisnanterre.iqplaylib.api.IPlayer;
 
@@ -78,14 +79,15 @@ public class PlayerService {
     public IPlayer getCurrentPlayer() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || !authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal())) {
-            throw new IllegalStateException("No authenticated player found.");
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new UnauthorizedException("No authenticated player found.");
         }
 
-        String username = authentication.getName(); // Supposant que l'email est utilisé comme principal
+        String username = authentication.getName();
         return playerRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalStateException("Authenticated player not found in database."));
+                .orElseThrow(() -> new UnauthorizedException("Authenticated player not found in database."));
     }
+
 
     /**
      * Invalide un token JWT et déconnecte le joueur.
