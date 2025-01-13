@@ -2,6 +2,7 @@ package fr.parisnanterre.iqplay.model;
 
 import fr.parisnanterre.iqplay.service.OperationService;
 
+import fr.parisnanterre.iqplay.validator.DefaultIAnswerValidator;
 import fr.parisnanterre.iqplaylib.core.AbstractGame;
 import fr.parisnanterre.iqplaylib.api.IGameSession;
 
@@ -9,18 +10,6 @@ import fr.parisnanterre.iqplaylib.api.IGameSession;
 public class GameCalculMental extends AbstractGame {
     private final OperationService operationService;
 
-    /**
-     * Represents a mental calculation game that extends the AbstractGame class.
-     * Utilizes an OperationService for generating mathematical operations.
-     *
-     * <p>Dependencies are injected via the constructor.</p>
-     *
-     * @param name the name of the game
-     * @param operationService the service used to create mathematical operations
-     *
-     * @see AbstractGame
-     * @see OperationService
-     */
     public GameCalculMental(String name, OperationService operationService) {
         super(name);
         this.operationService = operationService;
@@ -28,6 +17,7 @@ public class GameCalculMental extends AbstractGame {
 
     @Override
     protected IGameSession createGameSession() {
-        return new GameSession(this, operationService);
+        throw new UnsupportedOperationException("Game session creation is managed by GameCalculMentalService.");
     }
 }
+

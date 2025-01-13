@@ -2,63 +2,47 @@ package fr.parisnanterre.iqplay.mapper;
 
 import fr.parisnanterre.iqplay.entity.GameSessionPersistante;
 import fr.parisnanterre.iqplay.entity.Player;
-import fr.parisnanterre.iqplay.model.GameCalculMental;
 import fr.parisnanterre.iqplay.model.GameSession;
 import fr.parisnanterre.iqplay.model.Level;
 import fr.parisnanterre.iqplay.model.Score;
 import fr.parisnanterre.iqplay.service.OperationService;
-import fr.parisnanterre.iqplaylib.api.IGame;
-import fr.parisnanterre.iqplaylib.api.ILevel;
-import fr.parisnanterre.iqplaylib.api.IScore;
-import fr.parisnanterre.iqplaylib.api.StateGameSessionEnum;
+import fr.parisnanterre.iqplay.validator.DefaultIAnswerValidator;
+import fr.parisnanterre.iqplaylib.api.*;
+
 
 public class GameSessionMapper {
 
-    /**
-     * Transforme une instance de GameSession (métier) en une instance persistante.
-     *
-     * @param session L'objet métier GameSession
-     * @param player  Le joueur associé à la session
-     * @return Une instance de GameSessionPersistante
-     */
     public static GameSessionPersistante toPersistable(GameSession session, Player player) {
         return new GameSessionPersistante(
-            player,     
-            session.name(),                         // Associe le joueur
-            session.level().level(),              // Récupère le niveau actuel
-            session.score().score(),              // Récupère le score actuel
-            session.state().toString()            // Convertit l'état en chaîne
+                player,
+                session.name(),
+                session.level().level(),
+                session.score().score(),
+                session.state().toString()
         );
     }
 
-    /**
-     * Transforme une instance persistante de GameSessionPersistante en une instance métier.
-     *
-     * @param persistante L'objet GameSessionPersistante
-     * @param operationService Le service des opérations
-     * @return Une instance de GameSession
-     */
     public static GameSession toDomain(IGame game, GameSessionPersistante persistante, OperationService operationService) {
-        GameSession session = new GameSession(game, operationService);
-        // Reconstruit le niveau et le score
-        ILevel level = new Level(persistante.getLevel());
-        IScore score = new Score(persistante.getScore());
-        // Relancer la partie au niveau enregistre
-        session.start(level, score);
-        
+        // Récupérer le joueur depuis l'entité persistante
+        IPlayer player = persistante.getPlayer();
+
+        // Créer l'objet GameSession avec toutes les dépendances
+        GameSession session = new GameSession(game, operationService, new DefaultIAnswerValidator(), player);
+
+        // Initialiser la session avec le niveau et le score persistés
+        session.start(new Level(persistante.getLevel()), new Score(persistante.getScore()));
+
+        // Restaurer l'état de la session
+        session.setState(StateGameSessionEnum.valueOf(persistante.getState()));
+
         return session;
     }
 
-    /**
-     * Met à jour une instance persistante existante de GameSessionPersistante à partir d'une instance métier.
-     *
-     * @param session L'objet métier GameSession
-     * @param persistante L'entité persistante existante à mettre à jour
-     */
+
     public static void updatePersistable(GameSession session, GameSessionPersistante persistante) {
-        persistante.setLevel(session.level().level());  // Met à jour le niveau
-        persistante.setScore(session.score().score());  // Met à jour le score
-        persistante.setState(session.state().toString()); // Met à jour l'état
-        // Ajoute d'autres champs si nécessaire
+        persistante.setLevel(session.level().level());
+        persistante.setScore(session.score().score());
+        persistante.setState(session.state().toString());
     }
 }
+

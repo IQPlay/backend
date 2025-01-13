@@ -1,5 +1,6 @@
 package fr.parisnanterre.iqplay.entity;
 
+import fr.parisnanterre.iqplaylib.api.StateGameSessionEnum;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -32,6 +33,7 @@ public class GameSessionPersistante {
     // Constructeurs
     public GameSessionPersistante() {
         this.createdAt = LocalDateTime.now(); // Date par défaut à la création
+        this.state = StateGameSessionEnum.CREATED.toString();
     }
 
     public GameSessionPersistante(Player player, String name, int level, int score, String state) {
@@ -98,5 +100,18 @@ public class GameSessionPersistante {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    @Override
+    public String toString() {
+        return "GameSessionPersistante{" +
+                "id=" + id +
+                ", player=" + player +
+                ", name='" + name + '\'' +
+                ", level=" + level +
+                ", score=" + score +
+                ", state='" + state + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }

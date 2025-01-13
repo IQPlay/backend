@@ -77,17 +77,10 @@ public class PlayerService {
      * @return Le joueur actuellement connecté.
      */
     public IPlayer getCurrentPlayer() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
-            throw new UnauthorizedException("No authenticated player found.");
-        }
-
-        String username = authentication.getName();
+        String username = SecurityUtils.getCurrentUsername();
         return playerRepository.findByUsername(username)
                 .orElseThrow(() -> new UnauthorizedException("Authenticated player not found in database."));
     }
-
 
     /**
      * Invalide un token JWT et déconnecte le joueur.

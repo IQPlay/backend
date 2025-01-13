@@ -1,145 +1,122 @@
 package fr.parisnanterre.iqplay.service;
 
-import org.springframework.stereotype.Service;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.List;
-import java.util.Map;
-
-import fr.parisnanterre.iqplay.mapper.GameSessionMapper;
-import fr.parisnanterre.iqplay.model.GameCalculMental;
-import fr.parisnanterre.iqplay.model.GameSession;
 import fr.parisnanterre.iqplay.dto.GameStopResponseDto;
 import fr.parisnanterre.iqplay.entity.GameSessionPersistante;
 import fr.parisnanterre.iqplay.entity.Player;
-import fr.parisnanterre.iqplay.repository.GameSessionRepository;
+import fr.parisnanterre.iqplay.manager.ActiveSessionManager;
+import fr.parisnanterre.iqplay.manager.SessionStateManager;
+import fr.parisnanterre.iqplay.mapper.GameSessionMapper;
+import fr.parisnanterre.iqplay.model.GameCalculMental;
 import fr.parisnanterre.iqplay.model.Level;
 import fr.parisnanterre.iqplay.model.Score;
+import fr.parisnanterre.iqplay.repository.GameSessionRepository;
+import fr.parisnanterre.iqplay.validator.DefaultIAnswerValidator;
+import fr.parisnanterre.iqplaylib.core.PlayerAnswer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import fr.parisnanterre.iqplaylib.api.*;
+import fr.parisnanterre.iqplay.model.GameSession;
+
+import java.util.List;
 
 @Service
-public class GameCalculMentalService implements IGameSessionService {
-    private final Map<Long, GameSession> activeSessions = new ConcurrentHashMap<>();
-    private final OperationService operationService;
+public class GameCalculMentalService {
+
+    private static final Logger log = LoggerFactory.getLogger(GameCalculMentalService.class);
+    private final SessionStateManager stateManager;
+    private final ActiveSessionManager activeSessionManager;
     private final GameSessionRepository gameSessionRepository;
+    private final OperationService operationService;
 
-    public GameCalculMentalService(OperationService operationService, GameSessionRepository gameSessionRepository) {
-        this.operationService = operationService;
+    @Autowired
+    public GameCalculMentalService(SessionStateManager stateManager,
+                                   ActiveSessionManager activeSessionManager,
+                                   GameSessionRepository gameSessionRepository,
+                                   OperationService operationService) { // Injecter OperationService
+        this.stateManager = stateManager;
+        this.activeSessionManager = activeSessionManager;
         this.gameSessionRepository = gameSessionRepository;
+        this.operationService = operationService;
     }
 
-    /**
-     * Starts a new game session.
-     * 
-     * @return The ID of the session that has been persisted.
-     */
-    public Long startSession() {
-        IPlayer player = new Player();
-        IGame game = new GameCalculMental("Calcul Mental", operationService);
-
-        // Create the session
-        IGameSession session = createSession(player, game);
-
-        // Initialize session with default level and score
+    public Long createSession(IPlayer player, IGame game) {
+        GameSession session = new GameSession(game, operationService, new DefaultIAnswerValidator(), player);
         session.start(new Level(1), new Score(0));
 
-        // Return the session ID
-        return getSessionId(session);
+        Player playerEntity = (Player) player;
+        GameSessionPersistante persistableSession = GameSessionMapper.toPersistable(session, playerEntity);
+        persistableSession.setState(StateGameSessionEnum.CREATED.toString());
+
+        GameSessionPersistante savedSession = gameSessionRepository.save(persistableSession);
+
+        Long sessionId = savedSession.getId();
+        activeSessionManager.addSession(sessionId, session);
+        return sessionId;
     }
 
-    /**
-     * Creates a new session for a player and game, persists it, and adds it to memory.
-     */
-    @Override
-    public IGameSession createSession(IPlayer player, IGame game) {
-        GameSession session = new GameSession(game, operationService);
+    public IQuestion getNextOperation(Long sessionId) {
+        GameSession session = (GameSession) activeSessionManager.getSession(sessionId)
+                .orElseGet(() -> gameSessionRepository.findById(sessionId)
+                        .map(persistable -> {
+                            GameSession restoredSession = GameSessionMapper.toDomain(
+                                    new GameCalculMental("Calcul Mental", operationService),
+                                    persistable,
+                                    operationService
+                            );
+                            activeSessionManager.addSession(sessionId, restoredSession);
+                            return restoredSession;
+                        })
+                        .orElseThrow(() -> new IllegalArgumentException("Session not found"))
+                );
 
-        // Ensure the session is initialized with default level and score
-        session.start(new Level(1), new Score(0));
-
-        // Map to a persistable entity and save to database
-        GameSessionPersistante persistante = GameSessionMapper.toPersistable(session, (fr.parisnanterre.iqplay.entity.Player) player);
-        GameSessionPersistante savedEntity = gameSessionRepository.save(persistante);
-
-        // Store in memory
-        activeSessions.put(savedEntity.getId(), session);
-
-        return session;
-    }
-
-    @Override
-    public IGameSession findSession(Long sessionId) {
-        GameSession session = activeSessions.get(sessionId);
-        if (session != null) {
-            return session;
+        // Transition de l'état si nécessaire
+        if (session.state() == StateGameSessionEnum.ENDED) {
+            throw new IllegalStateException("Cannot generate new operations for an ended session.");
         }
 
-        return gameSessionRepository.findById(sessionId)
-                .map(persistante -> {
-                    GameSession loadedSession = GameSessionMapper.toDomain(
-                            new GameCalculMental("Calcul Mental", operationService), 
-                            persistante, 
-                            operationService
-                    );
-                    activeSessions.put(sessionId, loadedSession);
-                    return loadedSession;
-                })
-                .orElse(null);
-    }
-
-    @Override
-    public Long getSessionId(IGameSession session) {
-        return activeSessions.entrySet().stream()
-                .filter(entry -> entry.getValue().equals(session))
-                .map(Map.Entry::getKey)
-                .findFirst()
-                .orElse(null);
-    }
-
-    public void synchronizeSession(Long sessionId) {
-        GameSession session = activeSessions.get(sessionId);
-        if (session != null) {
-            gameSessionRepository.findById(sessionId).ifPresent(persistante -> {
-                GameSessionMapper.updatePersistable(session, persistante);
-                gameSessionRepository.save(persistante);
-            });
+        if (session.state() == StateGameSessionEnum.CREATED || session.state() == StateGameSessionEnum.PAUSED) {
+            stateManager.transitionTo(session, StateGameSessionEnum.STARTED);
         }
+
+        return session.nextQuestion();
     }
+
+    public boolean submitAnswer(Long sessionId, String playerAnswer) {
+        GameSession session = (GameSession) activeSessionManager.getSession(sessionId)
+                .orElseThrow(() -> new IllegalArgumentException("Session not found"));
+
+        if (session.state() == StateGameSessionEnum.ENDED) {
+            throw new IllegalStateException("Session has already ended.");
+        }
+
+        IPlayerAnswer answer = new PlayerAnswer(playerAnswer);
+        boolean isCorrect = session.submitAnswer(answer);
+
+        if (isCorrect) {
+            stateManager.transitionTo(session, StateGameSessionEnum.IN_PROGRESS);
+            gameSessionRepository.save(GameSessionMapper.toPersistable(session, (Player) session.getPlayer()));
+        } else {
+            stateManager.transitionTo(session, StateGameSessionEnum.ENDED);
+            gameSessionRepository.save(GameSessionMapper.toPersistable(session, (Player) session.getPlayer()));
+            activeSessionManager.removeSession(sessionId);
+        }
+        return isCorrect;
+    }
+
 
     public GameStopResponseDto endSession(Long sessionId) {
-    // Trouve la session active ou chargée depuis la base
-    GameSession session = (GameSession) findSession(sessionId);
+        GameSession session = (GameSession) activeSessionManager.getSession(sessionId)
+                .orElseThrow(() -> new IllegalArgumentException("Session not found"));
+        stateManager.transitionTo(session, StateGameSessionEnum.ENDED);
+        activeSessionManager.removeSession(sessionId);
 
-    // Vérifie si la session existe
-    if (session == null) {
-        throw new IllegalArgumentException("Session non trouvée.");
+        return new GameStopResponseDto(GameMessageEnum.GAME_STOPPED.message(), session.score().score(), "ENDED");
     }
-
-    // Vérifie si la session est déjà terminée
-    if (session.state() == StateGameSessionEnum.ENDED) {
-        throw new IllegalStateException("La session est déjà terminée.");
-    }
-
-    // Termine la session
-    session.end();
-
-    // Synchronise l'état de la session en base de données
-    synchronizeSession(sessionId);
-
-    // Supprime la session terminée de la map des sessions actives
-    activeSessions.remove(sessionId);
-    // Retourne une réponse avec les informations de fin de session
-    return new GameStopResponseDto(
-            GameMessageEnum.GAME_STOPPED.message(),
-            session.score().score(),
-            session.state().name()
-    );
-}
-
 
     public List<GameSessionPersistante> getSessionsByPlayer(IPlayer player) {
-        if (player == null) {
-            throw new IllegalArgumentException("Player cannot be null.");
-        }
         return gameSessionRepository.findByPlayer(player);
     }
 }
