@@ -9,6 +9,8 @@ import fr.parisnanterre.iqplay.mapper.GameSessionMapper;
 import fr.parisnanterre.iqplay.model.GameCalculMental;
 import fr.parisnanterre.iqplay.model.GameSession;
 import fr.parisnanterre.iqplay.dto.GameStopResponseDto;
+import fr.parisnanterre.iqplay.dto.GamePauseResponseDto;
+import fr.parisnanterre.iqplay.dto.GameResumeResponseDto;
 import fr.parisnanterre.iqplay.entity.GameSessionPersistante;
 import fr.parisnanterre.iqplay.entity.Player;
 import fr.parisnanterre.iqplay.repository.GameSessionRepository;
@@ -30,21 +32,22 @@ public class GameCalculMentalService implements IGameSessionService {
     /**
      * Starts a new game session.
      * 
+     * @param player The player for the session.
+     * @param game The game for the session.
      * @return The ID of the session that has been persisted.
      */
-    public Long startSession() {
-        IPlayer player = new Player();
-        IGame game = new GameCalculMental("Calcul Mental", operationService);
-
+    public Long startSession(IPlayer player, IGame game) {
         // Create the session
         IGameSession session = createSession(player, game);
 
         // Initialize session with default level and score
         session.start(new Level(1), new Score(0));
+        activeSessions.put(getSessionId(session), (GameSession) session);
 
         // Return the session ID
         return getSessionId(session);
     }
+
 
     /**
      * Creates a new session for a player and game, persists it, and adds it to memory.
@@ -95,6 +98,7 @@ public class GameCalculMentalService implements IGameSessionService {
                 .orElse(null);
     }
 
+
     public void synchronizeSession(Long sessionId) {
         GameSession session = activeSessions.get(sessionId);
         if (session != null) {
@@ -131,9 +135,10 @@ public class GameCalculMentalService implements IGameSessionService {
     return new GameStopResponseDto(
             GameMessageEnum.GAME_STOPPED.message(),
             session.score().score(),
-            session.state().name()
+            session.state().toString()
     );
 }
+
 
 
     public List<GameSessionPersistante> getSessionsByPlayer(IPlayer player) {
@@ -141,5 +146,71 @@ public class GameCalculMentalService implements IGameSessionService {
             throw new IllegalArgumentException("Player cannot be null.");
         }
         return gameSessionRepository.findByPlayer(player);
+    }
+
+    public GamePauseResponseDto pauseSession(Long sessionId) {
+        // Trouve la session active ou chargée depuis la base
+        GameSession session = (GameSession) findSession(sessionId);
+
+        // Vérifie si la session existe
+        if (session == null) {
+            throw new IllegalArgumentException("Session non trouvée.");
+        }
+
+        // Vérifie si la session est déjà terminée
+        if (session.state() == StateGameSessionEnum.ENDED) {
+            throw new IllegalStateException("La session est déjà terminée.");
+        }
+
+        // Vérifie si la session est en cours (IN_PROGRESS)
+        if (session.state() != StateGameSessionEnum.IN_PROGRESS) {
+            throw new IllegalStateException("La session n'est pas en cours.");
+        }
+
+        // Met à jour l'état de la session à PAUSED
+        session.pause();
+
+        // Synchronise l'état de la session en base de données
+        synchronizeSession(sessionId);
+
+        // Supprime la session mise en pause de la map des sessions actives
+        activeSessions.remove(sessionId);
+
+        // Retourne une réponse avec les informations de mise en pause
+        return new GamePauseResponseDto(
+                "Game paused successfully",
+                session.score().score(),
+                session.state().toString()
+        );
+    }
+
+    public GameResumeResponseDto resumeSession(Long sessionId) {
+        // Trouve la session persistante dans la base de données
+        GameSessionPersistante persistante = gameSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new IllegalArgumentException("Session non trouvée."));
+        // Vérifie si la session est en pause
+        if (!persistante.getState().equals(StateGameSessionEnum.PAUSED.name())) {
+            throw new IllegalStateException("La session n'est pas en pause.");
+        }
+
+        // Transforme la session persistante en une session métier
+        GameSession session = GameSessionMapper.toDomain(
+                new GameCalculMental("Calcul Mental", operationService),
+                persistante,
+                operationService
+        );
+
+        // Ajoute la session à la map des sessions actives
+        activeSessions.put(sessionId, session);
+
+        // Synchronise l'état de la session en base de données
+        synchronizeSession(sessionId);
+
+        // Retourne une réponse avec les informations de reprise
+        return new GameResumeResponseDto(
+                "Game resumed successfully",
+                session.score().score(),
+                session.state().toString()
+        );
     }
 }

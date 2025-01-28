@@ -46,11 +46,9 @@ public class GameCalculMentalController {
     public ResponseEntity<StartGameResponseDto> startGame(@RequestBody StartGameRequestDto request) {
         try {
             IPlayer player = playerService.getCurrentPlayer();
-
             IGame game = new GameCalculMental("Calcul Mental", operationService);
-            IGameSession session = gameSessionService.createSession(player, game);
 
-            Long sessionId = gameSessionService.getSessionId(session);
+            Long sessionId = gameSessionService.startSession(player, game);
             return ResponseEntity.ok(new StartGameResponseDto(
                     GameMessageEnum.SESSION_STARTED.message(),
                     sessionId
@@ -75,6 +73,24 @@ public class GameCalculMentalController {
         ResponseEntity<GameStopResponseDto> validationResponse = validateSession(session);
         if (validationResponse != null) {
             return ResponseEntity.status(validationResponse.getStatusCode()).body(null);
+        }
+
+        // Vérifie si la session est terminée
+        if (session.state() == StateGameSessionEnum.ENDED) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new NextOperationResponseDto(
+                    GameMessageEnum.GAME_ENDED_NO_OPERATION.message(),
+                    null,
+                    "ENDED"
+            ));
+        }
+
+        // Vérifie si la session est en cours
+        if (session.state() != StateGameSessionEnum.IN_PROGRESS) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new NextOperationResponseDto(
+                    GameMessageEnum.GAME_ENDED_NO_OPERATION.message(),
+                    null,
+                    "UNKNOWN"
+            ));
         }
 
         IQuestion lastQuestion = session.questionStorage().lastQuestion();
@@ -157,6 +173,69 @@ public class GameCalculMentalController {
         return ResponseEntity.ok(response);
 }
 
+    /**
+     * Pauses an ongoing game session.
+     *
+     * @param sessionId The unique identifier of the game session.
+     * @return ResponseEntity containing the result of the pause action.
+     */
+    @PostMapping("/pause/{sessionId}")
+    public ResponseEntity<GamePauseResponseDto> pauseGame(@PathVariable Long sessionId) {
+        try {
+            GamePauseResponseDto response = gameSessionService.pauseSession(sessionId);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new GamePauseResponseDto(
+                    ex.getMessage(),
+                    0,
+                    "UNKNOWN"
+            ));
+        } catch (IllegalStateException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new GamePauseResponseDto(
+                    ex.getMessage(),
+                    0,
+                    "ENDED"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new GamePauseResponseDto(
+                    "Failed to pause the session",
+                    0,
+                    "ERROR"
+            ));
+        }
+    }
+
+    /**
+     * Resumes a paused game session.
+     *
+     * @param sessionId The unique identifier of the game session.
+     * @return ResponseEntity containing the result of the resume action.
+     */
+    @PostMapping("/resume/{sessionId}")
+    public ResponseEntity<GameResumeResponseDto> resumeGame(@PathVariable Long sessionId) {
+        try {
+            GameResumeResponseDto response = gameSessionService.resumeSession(sessionId);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new GameResumeResponseDto(
+                    ex.getMessage(),
+                    0,
+                    "UNKNOWN"
+            ));
+        } catch (IllegalStateException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new GameResumeResponseDto(
+                    ex.getMessage(),
+                    0,
+                    "ENDED"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new GameResumeResponseDto(
+                    "Failed to resume the session",
+                    0,
+                    "ERROR"
+            ));
+        }
+    }
 
     /**
      * Validates the session existence and state.

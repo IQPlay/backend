@@ -11,8 +11,7 @@ import java.util.List;
 
 public class GameSession extends AbstractGameSession {
     private final OperationService operationService;
-    private final List<IQuestion> currentOperations; // Liste des opérations courantes
-
+    
     /**
      * Represents a game session that extends the AbstractGameSession class.
      * Manages the lifecycle of a game session, including creating levels, scores,
@@ -31,16 +30,16 @@ public class GameSession extends AbstractGameSession {
     public GameSession(IGame game, OperationService operationService) {
         super(game);
         this.operationService = operationService;
-        this.currentOperations = new ArrayList<>();
     }
 
     @Override
     public void start(ILevel level, IScore score) {
-        this.state = StateGameSessionEnum.STARTED;
+        this.state = StateGameSessionEnum.IN_PROGRESS;
         this.level = new Level(level.level());
         this.score = new Score(score.score());
      }
     
+     
     @Override
     protected IQuestionStorageSession createQuestionStorageSession() {
         return new QuestionStorageSession(); // Utilise QuestionStorageSession
@@ -55,7 +54,6 @@ public class GameSession extends AbstractGameSession {
     public IQuestion nextQuestion() {
         int difficulty = level().level(); // Utilise le niveau actuel comme difficulté
         IQuestion operation = operationService.createOperation(difficulty);
-        currentOperations.add(operation);
         questionStorage.addQuestion(operation);
         return operation;
     }
@@ -65,24 +63,7 @@ public class GameSession extends AbstractGameSession {
     public IQuestionStorageSession questionStorage() {
         return this.questionStorage;
     }
-
-    @Override
-    public void submitAnswer(IPlayerAnswer answer) {
-        questionStorage.addPlayerAnswer(answer);
-        IQuestion lastQuestion = questionStorage.lastQuestion();
-        ICorrectAnswer correctAnswer = lastQuestion.correctAnswer();
-
-        // Vérifie si la réponse est correcte
-        if (correctAnswer.answer().equals(answer.answer())) {
-            score.incrementScore(1);
-            level.levelUp();
-            onCorrectAnswer();
-        } else {
-            onIncorrectAnswer();
-        }
-    }
-
-    // remplacer par une fonction dans la biblio plus tard
+    
     public String name(){
         return game.name();
     }
