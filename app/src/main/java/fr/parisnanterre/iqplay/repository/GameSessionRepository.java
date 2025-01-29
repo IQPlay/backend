@@ -27,4 +27,6 @@ public interface GameSessionRepository extends JpaRepository<GameSessionPersista
 
     // Trouver des sessions associées à un joueur et un état spécifique
     List<GameSessionPersistante> findByPlayerAndState(IPlayer player, String state);
+
+
 }
