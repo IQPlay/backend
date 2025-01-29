@@ -5,13 +5,15 @@ meta {
 }
 
 post {
-  url: https://localhost:8443/api/game/answer/2?userAnswer=-14
-  body: none
+  url: https://localhost:8443/api/game/answer/21
+  body: json
   auth: none
 }
 
-params:query {
-  userAnswer: -14
+body:json {
+  {
+      "userAnswer": "10"
+  }
 }
 
 docs {
