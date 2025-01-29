@@ -11,7 +11,7 @@ public class GameSessionPersistante {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "player_id", nullable = false)
+    @JoinColumn(name = "player_id", nullable = true)
     private Player player;
 
     @Column(nullable = false)
