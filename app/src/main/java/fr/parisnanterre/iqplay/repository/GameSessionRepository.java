@@ -1,7 +1,6 @@
 package fr.parisnanterre.iqplay.repository;
 
 import fr.parisnanterre.iqplay.entity.GameSessionPersistante;
-import fr.parisnanterre.iqplay.entity.Player;
 import fr.parisnanterre.iqplaylib.api.IPlayer;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,5 +27,5 @@ public interface GameSessionRepository extends JpaRepository<GameSessionPersista
     // Trouver des sessions associées à un joueur et un état spécifique
     List<GameSessionPersistante> findByPlayerAndState(IPlayer player, String state);
 
-
+    List<GameSessionPersistante> findAllByPlayer(IPlayer player);
 }
