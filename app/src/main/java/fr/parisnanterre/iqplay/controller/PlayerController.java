@@ -17,12 +17,10 @@ import java.util.stream.Collectors;
 public class PlayerController {
 
     private final PlayerService playerService;
-    private final GameCalculMentalService GameCalculMentalService;
 
     @Autowired
-    public PlayerController(PlayerService playerService, GameCalculMentalService GameCalculMentalService) {
+    public PlayerController(PlayerService playerService) {
         this.playerService = playerService;
-        this.GameCalculMentalService = GameCalculMentalService;
     }
 
     /**
@@ -41,65 +39,4 @@ public class PlayerController {
         return ResponseEntity.ok(profile);
     }
 
-    /**
-     * Route to get player's statistics (number of games, average score, best score).
-     *
-     * @return ResponseEntity containing player's statistics.
-     */
-    @GetMapping("/statistics")
-    public ResponseEntity<PlayerStatisticsDto> getStatistics() {
-        IPlayer player = playerService.getCurrentPlayer();
-        List<GameSessionPersistante> sessions = GameCalculMentalService.getSessionsByPlayer(player);
-
-        int totalGames = sessions.size();
-        double averageScore = sessions.stream()
-                .mapToInt(GameSessionPersistante::getScore)
-                .average()
-                .orElse(0.0);
-        int bestScore = sessions.stream()
-                .mapToInt(GameSessionPersistante::getScore)
-                .max()
-                .orElse(0);
-
-        PlayerStatisticsDto statistics = new PlayerStatisticsDto(totalGames, averageScore, bestScore);
-        return ResponseEntity.ok(statistics);
-    }
-
-    /**
-     * Route to get the player's game history (finished games and current game if any).
-     *
-     * @return ResponseEntity containing the game history.
-     */
-    @GetMapping("/history")
-    public ResponseEntity<PlayerGameHistoryDto> getGameHistory() {
-        IPlayer player = playerService.getCurrentPlayer();
-        List<GameSessionPersistante> sessions = GameCalculMentalService.getSessionsByPlayer(player);
-
-        List<GameSessionDto> finishedGames = sessions.stream()
-                .filter(session -> "ENDED".equals(session.getState()))
-                .map(session -> new GameSessionDto(
-                        session.getId(),
-                        session.getName(),
-                        session.getLevel(),
-                        session.getScore(),
-                        session.getState(),
-                        session.getCreatedAt()
-                ))
-                .collect(Collectors.toList());
-
-        List<GameSessionDto> currentGames = sessions.stream()
-                .filter(session -> "STARTED".equals(session.getState()))
-                .map(session -> new GameSessionDto(
-                        session.getId(),
-                        session.getName(),
-                        session.getLevel(),
-                        session.getScore(),
-                        session.getState(),
-                        session.getCreatedAt()
-                ))
-                .collect(Collectors.toList());
-
-        PlayerGameHistoryDto history = new PlayerGameHistoryDto(finishedGames, currentGames);
-        return ResponseEntity.ok(history);
-    }
 }
