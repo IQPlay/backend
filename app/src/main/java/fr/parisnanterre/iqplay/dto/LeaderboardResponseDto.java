@@ -7,7 +7,7 @@ import fr.parisnanterre.iqplay.model.leaderboard.Prize;
 
 import java.util.List;
 
-public class GamelayerEntitiesResponseDto {
+public class LeaderboardResponseDto {
 
     private List<Mission> startedMissions;
     private List<Mission> completedMissions;
@@ -16,7 +16,7 @@ public class GamelayerEntitiesResponseDto {
     private Level highestLevel;
     private List<Prize> prizes;
 
-    public GamelayerEntitiesResponseDto(List<Mission> startedMissions, List<Mission> completedMissions,
+    public LeaderboardResponseDto(List<Mission> startedMissions, List<Mission> completedMissions,
                                         List<Achievement> startedAchievements, List<Achievement> completedAchievements,
                                         Level highestLevel, List<Prize> prizes) {
         this.startedMissions = startedMissions;
