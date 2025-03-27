@@ -24,6 +24,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Install Graphviz
+        run: sudo apt-get install graphviz
+
       - name: Setup Gradle
         env:
           USERNAME: ${{ github.actor }}
