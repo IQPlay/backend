@@ -17,52 +17,26 @@ jobs:
       contents: read
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
-    # 🔹 Correction : Création du fichier gradle.properties pour GitHub Packages Authentication
-    - name: Setup GitHub Packages authentication
-      run: |
-        mkdir -p ~/.gradle  # Créer le dossier si inexistant
-        touch ~/.gradle/gradle.properties  # Créer le fichier s'il n'existe pas
-        echo "gpr.user=${{ secrets.GITHUB_ACTOR }}" >> ~/.gradle/gradle.properties
-        echo "gpr.token=${{ secrets.GITHUB_TOKEN }}" >> ~/.gradle/gradle.properties
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582
 
-    # 🔹 Correction : Installer Graphviz pour éviter l'erreur "Cannot run program '/opt/local/bin/dot'"
-    - name: Install Graphviz (for PlantUML)
-      run: sudo apt-get update && sudo apt-get install -y graphviz
+      - name: Build with Gradle Wrapper
+        run: ./gradlew build
 
-    # 🔹 Configuration du JDK 21
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
+      - name: Run tests
+        run: ./gradlew test
 
-    # 🔹 Configuration de Gradle
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v4
-      with:
-        cache-read-only: false
-
-    # 🔹 Correction : Ajouter les options --add-opens pour le JDK
-    - name: Configure Gradle JVM Args
-      run: |
-        mkdir -p ~/.gradle  # Vérifier que le dossier existe
-        echo "org.gradle.jvmargs=--add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED" >> ~/.gradle/gradle.properties
-
-    # 🔹 Construire le projet avec Gradle
-    - name: Build with Gradle Wrapper
-      run: ./gradlew build --stacktrace
-
-    # 🔹 Exécuter les tests
-    - name: Run tests
-      run: ./gradlew test --stacktrace
-
-    # 🔹 Upload du rapport de couverture Codecov
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        files: ./build/reports/jacoco/test/jacocoTestReport.xml
-        fail_ci_if_error: true
-        verbose: true
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./build/reports/jacoco/test/jacocoTestReport.xml
+          fail_ci_if_error: true
+          verbose: true
