@@ -54,5 +54,5 @@ jobs:
         run: |
           gh release upload "${GITHUB_REF#refs/tags/}" \
             doxygen-doc.zip \
-            lib/build/docs/asciidoctorPdf/main.pdf#Documentation.pdf \
+            app/build/docs/asciidoctorPdf/main.pdf#Documentation.pdf \
             --clobber

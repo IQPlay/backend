@@ -17,7 +17,12 @@ plugins {
 
 asciidoctor {
     sourceDir = file('src/docs')
-    outputDir = file("${buildDir}/docs")
+    outputDir = file("${buildDir}/docs/asciidoctor")
+}
+
+asciidoctorPdf {
+    sourceDir = file('src/docs')
+    outputDir = file("${buildDir}/docs/asciidoctorPdf")
 }
 
 asciidoctorj {
@@ -27,15 +32,10 @@ asciidoctorj {
         diagram.version '1.5.16'
     }
     attributes 'build-gradle': file('build.gradle'),
-        'sourcedir': project.sourceSets.main.java.srcDirs[0],
-        'source-highlighter': 'rouge',
-        'rouge-style': 'github',
-        'rouge-theme': 'github'
-}
-
-asciidoctorPdf {
-    sourceDir = file('src/docs')
-    outputDir = file("${buildDir}/docs")
+            'sourcedir': project.sourceSets.main.java.srcDirs[0],
+            'source-highlighter': 'rouge',
+            'rouge-style': 'github',
+            'rouge-theme': 'github'
 }
 
 jacoco {
