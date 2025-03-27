@@ -67,8 +67,8 @@ repositories {
     maven {
         url = uri("https://maven.pkg.github.com/IQPlay/library/")
         credentials {
-            username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-            password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("gpr.user")
+            password = System.getenv("GH_PACKAGES_TOKEN") ?: project.findProperty("gpr.key")
         }
     }
 }
