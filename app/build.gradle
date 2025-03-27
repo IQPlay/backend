@@ -65,7 +65,7 @@ sonar {
 repositories {
     mavenCentral()
     maven {
-        url = uri("https://maven.pkg.github.com/IQPlay/library/")
+        url = uri("https://maven.pkg.github.com/IQPlay/library")
         credentials {
             username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("gpr.user")
             password = System.getenv("GH_PACKAGES_TOKEN") ?: project.findProperty("gpr.key")
