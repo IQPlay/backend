@@ -87,7 +87,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
 
     // External IQPlay Library
-    implementation 'fr.parisnanterre:iqplaylib:1.1.0'
+    implementation 'fr.parisnanterre:iqplaylib:0.3.2-SNAPSHOT'
 
     // JWT Dependencies
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
