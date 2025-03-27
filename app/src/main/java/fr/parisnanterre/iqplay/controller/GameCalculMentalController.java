@@ -11,6 +11,7 @@ import fr.parisnanterre.iqplaylib.api.*;
 
 import java.util.Map;
 
+import fr.parisnanterre.iqplaylib.gamelayer.GameLayerEventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,13 +28,14 @@ public class GameCalculMentalController {
     private final GameCalculMentalService gameSessionService;
     private final OperationService operationService;
     private final PlayerService playerService;
+    private final GameLayerEventService gameLayerEventService;
 
     @Autowired
-    public GameCalculMentalController(GameCalculMentalService gameSessionService, OperationService operationService, PlayerService playerService) {
+    public GameCalculMentalController(GameCalculMentalService gameSessionService, OperationService operationService, PlayerService playerService, GameLayerEventService gameLayerEventService) {
         this.gameSessionService = gameSessionService;
         this.operationService = operationService;
         this.playerService=playerService;
-        
+        this.gameLayerEventService = gameLayerEventService;
     }
 
     /**
@@ -121,7 +123,7 @@ public class GameCalculMentalController {
     public ResponseEntity<SubmitAnswerResponseDto> submitAnswer(
             @PathVariable Long sessionId,
             @RequestBody SubmitAnswerRequestDto request
-    ) {
+    ) throws Exception {
         IGameSession session = gameSessionService.findSession(sessionId);
         ResponseEntity<GameStopResponseDto> validationResponse = validateSession(session);
         if (validationResponse != null) {
@@ -132,6 +134,7 @@ public class GameCalculMentalController {
         session.submitAnswer(answer);
 
         if (session.state() == StateGameSessionEnum.ENDED) {
+            gameLayerEventService.completeEvent("2-lose-game-event", playerService.getCurrentPlayer().id().toString());
             return ResponseEntity.ok(new SubmitAnswerResponseDto(
                     GameMessageEnum.GAME_ENDED_NO_RESPONSE.message(),
                     session.score().score(),
@@ -139,6 +142,8 @@ public class GameCalculMentalController {
                     null
             ));
         }
+
+        gameLayerEventService.completeEvent("2-calcul-win-event", playerService.getCurrentPlayer().id().toString());
 
         IQuestion nextQuestion = session.nextQuestion();
         return ResponseEntity.ok(new SubmitAnswerResponseDto(
