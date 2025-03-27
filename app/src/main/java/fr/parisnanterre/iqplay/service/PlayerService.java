@@ -3,7 +3,6 @@ package fr.parisnanterre.iqplay.service;
 import fr.parisnanterre.iqplay.entity.Player;
 import fr.parisnanterre.iqplay.exception.UnauthorizedException;
 import fr.parisnanterre.iqplay.repository.PlayerRepository;
-import fr.parisnanterre.iqplay.service.gamelayer.GameLayerPlayerIntegrationService;
 import fr.parisnanterre.iqplaylib.api.IPlayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -17,17 +16,14 @@ public class PlayerService {
     private final PlayerRepository playerRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtBlacklistService jwtBlacklistService;
-    private final GameLayerPlayerIntegrationService gameLayerPlayerIntegrationService;
 
     @Autowired
     public PlayerService(PlayerRepository playerRepository,
                          PasswordEncoder passwordEncoder,
-                         JwtBlacklistService jwtBlacklistService,
-                         GameLayerPlayerIntegrationService gameLayerPlayerIntegrationService) {
+                         JwtBlacklistService jwtBlacklistService) {
         this.playerRepository = playerRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtBlacklistService = jwtBlacklistService;
-        this.gameLayerPlayerIntegrationService = gameLayerPlayerIntegrationService;
     }
 
     /**
@@ -52,9 +48,6 @@ public class PlayerService {
 
         Player savedPlayer = playerRepository.save(player);
 
-        // 🔄 Synchronisation GameLayer
-        gameLayerPlayerIntegrationService.createPlayer(savedPlayer);
-
         return savedPlayer;
     }
 
@@ -66,9 +59,6 @@ public class PlayerService {
                 .orElseThrow(() -> new IllegalArgumentException("No player found with this ID."));
 
         playerRepository.delete(player);
-
-        // 🔄 Synchronisation GameLayer
-        gameLayerPlayerIntegrationService.deletePlayer(player);
     }
 
     /**
