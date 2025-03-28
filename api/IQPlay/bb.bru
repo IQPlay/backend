@@ -1,0 +1,18 @@
+meta {
+  name: bb
+  type: http
+  seq: 3
+}
+
+get {
+  url: https://fr.wikipedia.org/w/api.php?action=query&prop=coordinates&format=json&titles=Tour_Eiffel
+  body: none
+  auth: inherit
+}
+
+params:query {
+  action: query
+  prop: coordinates
+  format: json
+  titles: Tour_Eiffel
+}
