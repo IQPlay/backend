@@ -1,13 +1,22 @@
 package fr.parisnanterre.iqplay.wikigame.model;
 
 import fr.parisnanterre.iqplay.wikigame.model.api.IQuestion;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
+@Entity
 public class Question implements IQuestion {
+    @Id
     private String id;
     private String intitule;
     private boolean isGeneratedByAi;
+    @OneToMany
+    @JoinColumn(name = "reponse_id")
     private List<Reponse> reponses;
 
     public String getId() {

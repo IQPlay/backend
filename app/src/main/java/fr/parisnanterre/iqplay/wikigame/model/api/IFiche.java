@@ -1,5 +1,9 @@
 package fr.parisnanterre.iqplay.wikigame.model.api;
 
+import fr.parisnanterre.iqplay.wikigame.model.WikiQuestion;
+
+import java.util.List;
+
 public interface IFiche {
      String getId();
      String getTitre();
@@ -8,6 +12,6 @@ public interface IFiche {
      void setBadge(String badge);
      String getDescription();
      void setDescription(String description);
-     IWikiQuestion getWikiQuestion();
-     void setWikiQuestion(IWikiQuestion wikiQuestion);
+     List<WikiQuestion> getWikiQuestions();
+     void setWikiQuestions(List<WikiQuestion> wikiQuestion);
 }

@@ -1,11 +1,12 @@
 package fr.parisnanterre.iqplay.wikigame.model.api;
 
-import fr.parisnanterre.iqplaylib.api.IQuestion;
+import fr.parisnanterre.iqplay.wikigame.model.Question;
+import fr.parisnanterre.iqplay.wikigame.model.WikiDocument;
 
 public interface IWikiQuestion {
      String getId();
-     IQuestion getQuestion();
-     void setQuestion(IQuestion question);
-     IWikiDocument getWikiDocument();
-     void setWikiDocument(IWikiDocument wikiDocument);
+     Question getQuestion();
+     void setQuestion(Question question);
+     WikiDocument getWikiDocument();
+     void setWikiDocument(WikiDocument wikiDocument);
 }

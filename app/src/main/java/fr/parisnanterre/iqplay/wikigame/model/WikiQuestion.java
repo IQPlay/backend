@@ -3,14 +3,21 @@ package fr.parisnanterre.iqplay.wikigame.model;
 import fr.parisnanterre.iqplay.wikigame.model.api.IWikiDocument;
 import fr.parisnanterre.iqplay.wikigame.model.api.IWikiQuestion;
 import fr.parisnanterre.iqplaylib.api.IQuestion;
+import jakarta.persistence.*;
 
 import java.util.List;
 
+@Entity
 public class WikiQuestion implements IWikiQuestion {
 
+    @Id
     private String id;
-    private IQuestion question;
-    private IWikiDocument wikiDocument;
+    @OneToOne
+    @JoinColumn(name = "question_id")
+    private Question question;
+    @OneToOne
+    @JoinColumn(name = "wiki_document_id")
+    private WikiDocument wikiDocument;
 
     @Override
     public String getId() {
@@ -18,22 +25,22 @@ public class WikiQuestion implements IWikiQuestion {
     }
 
     @Override
-    public IQuestion getQuestion() {
+    public Question getQuestion() {
         return question;
     }
 
     @Override
-    public void setQuestion(IQuestion question) {
+    public void setQuestion(Question question) {
         this.question = question;
     }
 
     @Override
-    public IWikiDocument getWikiDocument() {
+    public WikiDocument getWikiDocument() {
         return wikiDocument;
     }
 
     @Override
-    public void setWikiDocument(IWikiDocument wikiDocument) {
+    public void setWikiDocument(WikiDocument wikiDocument) {
         this.wikiDocument = wikiDocument;
     }
 

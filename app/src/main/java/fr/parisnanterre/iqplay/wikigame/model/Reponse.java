@@ -1,9 +1,13 @@
 package fr.parisnanterre.iqplay.wikigame.model;
 
 import fr.parisnanterre.iqplay.wikigame.model.api.IReponse;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
+@Entity
 public class Reponse implements IReponse {
 
+    @Id
     private String id;
     private String reponse;
     private boolean isCorrect;
