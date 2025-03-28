@@ -8,4 +8,6 @@ public interface IWikiDocument {
     void setContent(String content);
     String getUrl();
     void setUrl(String url);
+    String getWikiId();
+    void setWikiId(String wikiId);
 }

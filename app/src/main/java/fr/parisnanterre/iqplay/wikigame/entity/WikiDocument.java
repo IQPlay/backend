@@ -14,6 +14,7 @@ public class WikiDocument implements IWikiDocument {
     private String url;
     private String content;
     private String title;
+    private String wikiId;
 
     @Override
     public Long getId() {
@@ -48,6 +49,16 @@ public class WikiDocument implements IWikiDocument {
     @Override
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    @Override
+    public String getWikiId() {
+        return wikiId;
+    }
+
+    @Override
+    public void setWikiId(String wikiId) {
+        this.wikiId = wikiId;
     }
 
     @Override
