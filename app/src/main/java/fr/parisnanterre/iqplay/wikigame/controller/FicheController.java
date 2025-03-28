@@ -7,6 +7,7 @@ import fr.parisnanterre.iqplay.wikigame.dto.create.fiche.ReponseRequestDTO;
 import fr.parisnanterre.iqplay.wikigame.entity.*;
 import fr.parisnanterre.iqplay.wikigame.repository.FicheRepository;
 import fr.parisnanterre.iqplay.wikigame.service.WikiArticleService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -89,12 +90,9 @@ public class FicheController {
         try {
             ResponseEntity<WikiArticleDTO> response = wikiArticleService.getArticleByUrl(url);
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                WikiArticleDTO wikiArticleDTO = response.getBody();
-                WikiDocument wikiDocument = new WikiDocument();
-                wikiDocument.setUrl(url);
-                wikiDocument.setWikiId(wikiArticleDTO.getWikiId());
-                wikiDocument.setTitle(wikiArticleDTO.getTitle());
-                wikiDocument.setContent(wikiArticleDTO.getContent());
+                WikiDocument wikiDocument = getWikiDocument(url, response);
+
+                System.out.println("Content : " + wikiDocument.getContent());
                 return wikiDocument;
             }
         } catch (Exception e) {
@@ -102,6 +100,23 @@ public class FicheController {
         }
         return null;
     }
+
+    @NotNull
+    private static WikiDocument getWikiDocument(String url, ResponseEntity<WikiArticleDTO> response) {
+        WikiArticleDTO wikiArticleDTO = response.getBody();
+        WikiDocument wikiDocument = new WikiDocument();
+        wikiDocument.setUrl(url);
+        wikiDocument.setWikiId(wikiArticleDTO.getWikiId());
+        wikiDocument.setTitle(wikiArticleDTO.getTitle());
+
+        String content = wikiArticleDTO.getContent();
+        if (content != null && content.length() > 70) {
+            content = content.substring(0, 70);  // On garde seulement les 70 premiers caractères
+        }
+        wikiDocument.setContent(content);
+        return wikiDocument;
+    }
+
 
     private static Question getQuestion(WikiQuestionRequestDTO wikiQuestionDTO) {
         Question question = new Question();
