@@ -4,7 +4,7 @@ import fr.parisnanterre.iqplay.wikigame.entity.api.IWikiDocument;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 
-public class WikiDocumentRequestDTO implements IWikiDocument {
+public class WikiDocumentRequestDTO {
 
     @Id
     private Long id;

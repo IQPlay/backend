@@ -55,8 +55,15 @@ public class FicheController {
 
         WikiDocument wikiDocument = new WikiDocument();
         wikiDocument.setUrl(wikiQuestionDTO.getWikiDocument().getUrl());
-        wikiDocument.setContent(wikiQuestionDTO.getWikiDocument().getContent());
-        wikiDocument.setTitle(wikiQuestionDTO.getWikiDocument().getTitle());
+
+        /*
+         * @see WikiGeoSearchController
+         */
+        // Ces trois attributs seront récupéré grâce à un appel api wiki dans la route /api/geosearch
+
+//        wikiDocument.setContent(wikiQuestionDTO.getWikiDocument().getContent());
+//        wikiDocument.setTitle(wikiQuestionDTO.getWikiDocument().getTitle());
+//        wikiDocument.setWikiId(wikiQuestionDTO.getWikiDocument().getWikiId());
 
         Question question = getQuestion(wikiQuestionDTO);
 
