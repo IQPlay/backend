@@ -1,5 +1,6 @@
 package fr.parisnanterre.iqplay.wikigame.controller;
 
+import fr.parisnanterre.iqplay.service.PlayerService;
 import fr.parisnanterre.iqplay.wikigame.dto.WikiArticleDTO;
 import fr.parisnanterre.iqplay.wikigame.dto.create.fiche.FicheRequestDTO;
 import fr.parisnanterre.iqplay.wikigame.dto.create.fiche.WikiQuestionRequestDTO;
@@ -8,6 +9,9 @@ import fr.parisnanterre.iqplay.wikigame.entity.*;
 import fr.parisnanterre.iqplay.wikigame.repository.FicheRepository;
 import fr.parisnanterre.iqplay.wikigame.service.AimlApiService;
 import fr.parisnanterre.iqplay.wikigame.service.WikiArticleService;
+import fr.parisnanterre.iqplaylib.api.IPlayer;
+import fr.parisnanterre.iqplaylib.gamelayer.GameLayerEventService;
+import fr.parisnanterre.iqplaylib.gamelayer.GameLayerPlayerService;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,6 +38,16 @@ public class FicheController {
 
     @Autowired
     private AimlApiService aimlApiService;
+
+    private final GameLayerEventService gameLayerEventService;
+    private final GameLayerPlayerService gameLayerPlayerService;
+    private final PlayerService playerService;
+
+    public FicheController(GameLayerEventService gameLayerEventService, GameLayerPlayerService gameLayerPlayerService, PlayerService playerService) {
+        this.gameLayerEventService = gameLayerEventService;
+        this.gameLayerPlayerService = gameLayerPlayerService;
+        this.playerService = playerService;
+    }
 
     /**
      * Étape 1 : Charger les données d'un WikiDocument à partir de son URL
@@ -66,6 +80,7 @@ public class FicheController {
     @PostMapping("/create")
     public ResponseEntity<Fiche> create(@RequestBody FicheRequestDTO ficheRequestDTO) {
         try {
+            IPlayer player = playerService.getCurrentPlayer();
             Fiche fiche = new Fiche();
             fiche.setBadge(ficheRequestDTO.getBadge());
             fiche.setTitre(ficheRequestDTO.getTitre());
@@ -74,7 +89,7 @@ public class FicheController {
             List<WikiQuestion> wikiQuestions = new ArrayList<>();
 
             for (WikiQuestionRequestDTO wikiQuestionDTO : ficheRequestDTO.getWikiQuestions()) {
-                WikiQuestion wikiQuestion = getWikiQuestion(wikiQuestionDTO);
+                WikiQuestion wikiQuestion = getWikiQuestion(wikiQuestionDTO, player);
                 wikiQuestions.add(wikiQuestion);
             }
 
@@ -88,7 +103,7 @@ public class FicheController {
         }
     }
 
-    private WikiQuestion getWikiQuestion(WikiQuestionRequestDTO wikiQuestionDTO) {
+    private WikiQuestion getWikiQuestion(WikiQuestionRequestDTO wikiQuestionDTO, IPlayer player) throws InterruptedException, IOException {
         WikiQuestion wikiQuestion = new WikiQuestion();
 
         // Récupérer le WikiDocument via l'URL fournie
@@ -105,11 +120,13 @@ public class FicheController {
                 String content = wikiDocument.getContent();
                 String qcmJson = aimlApiService.generateQcm(content);
                 processAiQcmResponse(wikiQuestion, qcmJson);
+                this.gameLayerEventService.completeEvent("create-fiche-with-ia", player.id().toString());
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else {
             wikiQuestion.setQuestion(getQuestion(wikiQuestionDTO));  // Sinon, on récupère la question fournie par l'utilisateur
+            this.gameLayerEventService.completeEvent("create-fiche", player.id().toString());
         }
 
         return wikiQuestion;
