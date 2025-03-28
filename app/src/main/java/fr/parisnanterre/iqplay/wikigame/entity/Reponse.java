@@ -3,6 +3,7 @@ package fr.parisnanterre.iqplay.wikigame.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import fr.parisnanterre.iqplay.wikigame.entity.api.IReponse;
 import jakarta.persistence.*;
+import org.hibernate.type.NumericBooleanConverter;
 
 @Entity
 public class Reponse implements IReponse {
@@ -11,6 +12,8 @@ public class Reponse implements IReponse {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String reponse;
+
+    @Convert(converter = NumericBooleanConverter.class)
     private boolean isCorrect;
 
     @ManyToOne(fetch = FetchType.LAZY)

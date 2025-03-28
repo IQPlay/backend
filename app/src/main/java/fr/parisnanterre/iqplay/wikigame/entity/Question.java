@@ -2,6 +2,7 @@ package fr.parisnanterre.iqplay.wikigame.entity;
 
 import fr.parisnanterre.iqplay.wikigame.entity.api.IQuestion;
 import jakarta.persistence.*;
+import org.hibernate.type.NumericBooleanConverter;
 
 import java.util.List;
 
@@ -11,6 +12,8 @@ public class Question implements IQuestion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String intitule;
+
+    @Convert(converter = NumericBooleanConverter.class)
     private boolean isGeneratedByAi;
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reponse> reponses;

@@ -41,7 +41,7 @@ public class FicheController {
             }
 
             fiche.setWikiQuestions(wikiQuestions);
-            ficheRepository.save(fiche);  // Cela persistera les entités liées grâce à la cascade
+            ficheRepository.save(fiche);
             return new ResponseEntity<>(fiche, HttpStatus.CREATED);
         } catch (Exception e) {
             e.printStackTrace();
