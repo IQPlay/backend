@@ -1,15 +1,17 @@
 package fr.parisnanterre.iqplay.wikigame.model;
 
 import fr.parisnanterre.iqplay.wikigame.model.api.IFiche;
-
-import java.util.List;
+import fr.parisnanterre.iqplay.wikigame.model.api.IWikiQuestion;
+import jakarta.persistence.Id;
 
 public class Fiche implements IFiche {
+
+    @Id
     private String id;
     private String titre;
     private String badge;
     private String description;
-    private List<WikiQuestion> questions;
+    private IWikiQuestion wikiQuestion;
 
     @Override
     public String getId() {
@@ -47,13 +49,13 @@ public class Fiche implements IFiche {
     }
 
     @Override
-    public List<WikiQuestion> getQuestions() {
-        return questions;
+    public IWikiQuestion getWikiQuestion() {
+        return wikiQuestion;
     }
 
     @Override
-    public void setQuestions(List<WikiQuestion> questions) {
-        this.questions = questions;
+    public void setWikiQuestion(IWikiQuestion wikiQuestion) {
+        this.wikiQuestion = wikiQuestion;
     }
 
     @Override
@@ -63,7 +65,7 @@ public class Fiche implements IFiche {
                 ", titre='" + titre + '\'' +
                 ", badge='" + badge + '\'' +
                 ", description='" + description + '\'' +
-                ", questions=" + questions +
+                ", questions=" + wikiQuestion +
                 '}';
     }
 }

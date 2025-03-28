@@ -1,17 +1,16 @@
 package fr.parisnanterre.iqplay.wikigame.model;
 
+import fr.parisnanterre.iqplay.wikigame.model.api.IWikiDocument;
 import fr.parisnanterre.iqplay.wikigame.model.api.IWikiQuestion;
+import fr.parisnanterre.iqplaylib.api.IQuestion;
 
 import java.util.List;
 
 public class WikiQuestion implements IWikiQuestion {
+
     private String id;
-    private String wikiId;
-    private String url;
-    private String content;
-    private boolean isGeneratedByAi;
-    private String question;
-    private List<Reponse> reponses;
+    private IQuestion question;
+    private IWikiDocument wikiDocument;
 
     @Override
     public String getId() {
@@ -19,75 +18,30 @@ public class WikiQuestion implements IWikiQuestion {
     }
 
     @Override
-    public String getWikiId() {
-        return wikiId;
-    }
-
-    @Override
-    public void setWikiId(String wikiId) {
-        this.wikiId = wikiId;
-    }
-
-    @Override
-    public String getUrl() {
-        return url;
-    }
-
-    @Override
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    @Override
-    public String getContent() {
-        return content;
-    }
-
-    @Override
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    @Override
-    public boolean isGeneratedByAi() {
-        return isGeneratedByAi;
-    }
-
-    @Override
-    public void setGeneratedByAi(boolean generatedByAi) {
-        isGeneratedByAi = generatedByAi;
-    }
-
-    @Override
-    public String getQuestion() {
+    public IQuestion getQuestion() {
         return question;
     }
 
     @Override
-    public void setQuestion(String question) {
+    public void setQuestion(IQuestion question) {
         this.question = question;
     }
 
     @Override
-    public List<Reponse> getReponses() {
-        return reponses;
+    public IWikiDocument getWikiDocument() {
+        return wikiDocument;
     }
 
     @Override
-    public void setReponses(List<Reponse> reponses) {
-        this.reponses = reponses;
+    public void setWikiDocument(IWikiDocument wikiDocument) {
+        this.wikiDocument = wikiDocument;
     }
 
     @Override
     public String toString() {
         return "WikiQuestion{" +
                 "id='" + id + '\'' +
-                ", wikiId='" + wikiId + '\'' +
-                ", url='" + url + '\'' +
-                ", content='" + content + '\'' +
-                ", isGeneratedByAi=" + isGeneratedByAi +
                 ", question='" + question + '\'' +
-                ", reponses=" + reponses +
                 '}';
     }
 }
