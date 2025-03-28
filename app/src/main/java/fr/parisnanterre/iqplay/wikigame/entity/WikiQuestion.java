@@ -47,6 +47,14 @@ public class WikiQuestion implements IWikiQuestion {
         this.wikiDocument = wikiDocument;
     }
 
+    public Fiche getFiche() {
+        return fiche;
+    }
+
+    public void setFiche(Fiche fiche) {
+        this.fiche = fiche;
+    }
+
     @Override
     public String toString() {
         return "WikiQuestion{" +

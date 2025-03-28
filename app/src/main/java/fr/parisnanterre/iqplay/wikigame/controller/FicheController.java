@@ -93,6 +93,10 @@ public class FicheController {
                 wikiQuestions.add(wikiQuestion);
             }
 
+            for (WikiQuestion wikiQuestion : wikiQuestions) {
+                wikiQuestion.setFiche(fiche);
+            }
+
             fiche.setWikiQuestions(wikiQuestions);
 
             ficheRepository.save(fiche);
