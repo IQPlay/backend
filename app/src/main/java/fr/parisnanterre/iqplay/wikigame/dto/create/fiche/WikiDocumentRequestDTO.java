@@ -1,48 +1,38 @@
-package fr.parisnanterre.iqplay.wikigame.entity;
+package fr.parisnanterre.iqplay.wikigame.dto.create.fiche;
 
 import fr.parisnanterre.iqplay.wikigame.entity.api.IWikiDocument;
-import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
 
-@Entity
-public class WikiDocument implements IWikiDocument {
+public class WikiDocumentRequestDTO implements IWikiDocument {
+
     @Id
     private Long id;
+    @NotBlank(message = "URL ne peut pas être vide")
     private String url;
+    @NotBlank(message = "Content ne peut pas être vide")
     private String content;
+    @NotBlank(message = "Title ne peut pas être vide")
     private String title;
 
-    @Override
     public Long getId() {
         return id;
     }
-
-    @Override
     public String getUrl() {
         return url;
     }
-
-    @Override
     public void setUrl(String url) {
         this.url = url;
     }
-
-    @Override
     public String getContent() {
         return content;
     }
-
-    @Override
     public void setContent(String content) {
         this.content = content;
     }
-
-    @Override
     public String getTitle() {
         return title;
     }
-
-    @Override
     public void setTitle(String title) {
         this.title = title;
     }

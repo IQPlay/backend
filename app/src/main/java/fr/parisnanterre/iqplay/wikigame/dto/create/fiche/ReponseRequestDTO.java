@@ -1,43 +1,32 @@
-package fr.parisnanterre.iqplay.wikigame.entity;
+package fr.parisnanterre.iqplay.wikigame.dto.create.fiche;
 
-import fr.parisnanterre.iqplay.wikigame.entity.api.IReponse;
-import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
 
-@Entity
-public class Reponse implements IReponse {
+public class ReponseRequestDTO {
 
     @Id
     private String id;
+    @NotBlank(message = "La réponse ne peut pas être vide")
     private String reponse;
+    @NotBlank(message = "isCorrect ne peut pas être vide")
     private boolean isCorrect;
 
-    @Override
     public String getId() {
         return id;
     }
-
-    @Override
     public void setId(String id) {
         this.id = id;
     }
-
-    @Override
     public String getReponse() {
         return reponse;
     }
-
-    @Override
     public void setReponse(String reponse) {
         this.reponse = reponse;
     }
-
-    @Override
     public boolean isCorrect() {
         return isCorrect;
     }
-
-    @Override
     public void setCorrect(boolean correct) {
         isCorrect = correct;
     }

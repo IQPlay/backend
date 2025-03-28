@@ -1,42 +1,30 @@
-package fr.parisnanterre.iqplay.wikigame.entity;
+package fr.parisnanterre.iqplay.wikigame.dto.create.fiche;
 
-import fr.parisnanterre.iqplay.wikigame.entity.api.IWikiQuestion;
-import jakarta.persistence.*;
+import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
 
-@Entity
-public class WikiQuestion implements IWikiQuestion {
+public class WikiQuestionRequestDTO {
 
     @Id
     private String id;
-    @OneToOne
-    @JoinColumn(name = "question_id")
-    private Question question;
-    @OneToOne
-    @JoinColumn(name = "wiki_document_id")
-    private WikiDocument wikiDocument;
+    @NotBlank(message = "Question ne peut pas être vide")
+    private QuestionRequestDTO question;
+    @NotBlank(message = "WikiDocument ne peut pas être vide")
+    private WikiDocumentRequestDTO wikiDocument;
 
-    @Override
     public String getId() {
         return id;
     }
-
-    @Override
-    public Question getQuestion() {
+    public QuestionRequestDTO getQuestion() {
         return question;
     }
-
-    @Override
-    public void setQuestion(Question question) {
+    public void setQuestion(QuestionRequestDTO question) {
         this.question = question;
     }
-
-    @Override
-    public WikiDocument getWikiDocument() {
+    public WikiDocumentRequestDTO getWikiDocument() {
         return wikiDocument;
     }
-
-    @Override
-    public void setWikiDocument(WikiDocument wikiDocument) {
+    public void setWikiDocument(WikiDocumentRequestDTO wikiDocument) {
         this.wikiDocument = wikiDocument;
     }
 

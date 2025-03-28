@@ -1,64 +1,48 @@
-package fr.parisnanterre.iqplay.wikigame.entity;
+package fr.parisnanterre.iqplay.wikigame.dto.create.fiche;
 
-import fr.parisnanterre.iqplay.wikigame.entity.api.IFiche;
-import jakarta.persistence.*;
+import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;
 
-@Entity
-public class Fiche implements IFiche {
+public class FicheRequestDTO {
 
     @Id
     private String id;
+    @NotBlank(message = "Le titre de la fiche est obligatoire")
     private String titre;
+    @NotBlank(message = "Le badge de la fiche est obligatoire")
     private String badge;
+    @NotBlank(message = "La description de la fiche est obligatoire")
     private String description;
-    @OneToMany
-    @JoinColumn(name = "wiki_question_id")
-    private List<WikiQuestion> wikiQuestion;
+    @NotBlank(message = "Les questions de la fiche sont obligatoires")
+    private List<WikiQuestionRequestDTO> wikiQuestion;
 
-    @Override
     public String getId() {
         return id;
     }
-
-    @Override
     public String getTitre() {
         return titre;
     }
-
-    @Override
     public void setTitre(String titre) {
         this.titre = titre;
     }
-
-    @Override
     public String getBadge() {
         return badge;
     }
-
-    @Override
     public void setBadge(String badge) {
         this.badge = badge;
     }
-
-    @Override
     public String getDescription() {
         return description;
     }
-
-    @Override
     public void setDescription(String description) {
         this.description = description;
     }
-
-    @Override
-    public List<WikiQuestion> getWikiQuestions() {
+    public List<WikiQuestionRequestDTO> getWikiQuestions() {
         return wikiQuestion;
     }
-
-    @Override
-    public void setWikiQuestions(List<WikiQuestion> wikiQuestion) {
+    public void setWikiQuestions(List<WikiQuestionRequestDTO> wikiQuestion) {
         this.wikiQuestion = wikiQuestion;
     }
 

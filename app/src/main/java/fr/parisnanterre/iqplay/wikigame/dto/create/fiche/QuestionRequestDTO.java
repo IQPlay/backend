@@ -1,54 +1,38 @@
-package fr.parisnanterre.iqplay.wikigame.entity;
+package fr.parisnanterre.iqplay.wikigame.dto.create.fiche;
 
-import fr.parisnanterre.iqplay.wikigame.entity.api.IQuestion;
-import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;
 
-@Entity
-public class Question implements IQuestion {
+public class QuestionRequestDTO {
     @Id
     private String id;
+    @NotBlank(message = "L'intitulé de la question ne peut pas être vide")
     private String intitule;
     private boolean isGeneratedByAi;
-    @OneToMany
-    @JoinColumn(name = "reponse_id")
-    private List<Reponse> reponses;
+    @NotBlank(message = "La liste des réponses ne peut pas être vide")
+    private List<ReponseRequestDTO> reponses;
 
     public String getId() {
         return id;
     }
-
-    @Override
     public String getIntitule() {
         return intitule;
     }
-
-    @Override
     public void setIntitule(String intitule) {
         this.intitule = intitule;
     }
-
-    @Override
     public boolean isGeneratedByAi() {
         return isGeneratedByAi;
     }
-
-    @Override
     public void setGeneratedByAi(boolean generatedByAi) {
         isGeneratedByAi = generatedByAi;
     }
-    @Override
-
-    public List<Reponse> getReponses() {
+    public List<ReponseRequestDTO> getReponses() {
         return reponses;
     }
-
-    @Override
-    public void setReponses(List<Reponse> reponses) {
+    public void setReponses(List<ReponseRequestDTO> reponses) {
         this.reponses = reponses;
     }
 
