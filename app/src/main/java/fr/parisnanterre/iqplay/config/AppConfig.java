@@ -5,6 +5,7 @@ import fr.parisnanterre.iqplay.service.OperationService;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Configuration class for defining application beans.
@@ -51,5 +52,10 @@ public class AppConfig {
     @Bean
     public GameCalculMental gameCalculMental(OperationService operationService) {
         return new GameCalculMental("Calcul Mental", operationService);
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }

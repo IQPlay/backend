@@ -89,6 +89,10 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testImplementation 'org.mockito:mockito-core:5.11.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    implementation("info.bliki.wiki:bliki-core:3.1.0")
+    implementation("org.jsoup:jsoup:1.19.1")
+    implementation 'com.azure:azure-ai-textanalytics:5.5.6'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
