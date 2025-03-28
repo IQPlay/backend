@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 public class WikiQuestion implements IWikiQuestion {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @OneToOne
     @JoinColumn(name = "question_id")

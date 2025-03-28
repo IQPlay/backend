@@ -2,12 +2,15 @@ package fr.parisnanterre.iqplay.wikigame.entity;
 
 import fr.parisnanterre.iqplay.wikigame.entity.api.IReponse;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
 public class Reponse implements IReponse {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String reponse;
     private boolean isCorrect;

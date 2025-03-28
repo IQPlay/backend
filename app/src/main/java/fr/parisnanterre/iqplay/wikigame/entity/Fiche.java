@@ -9,6 +9,7 @@ import java.util.List;
 public class Fiche implements IFiche {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String titre;
     private String badge;
