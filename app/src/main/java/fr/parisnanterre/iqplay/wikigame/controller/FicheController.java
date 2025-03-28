@@ -1,11 +1,13 @@
 package fr.parisnanterre.iqplay.wikigame.controller;
 
+import fr.parisnanterre.iqplay.wikigame.dto.WikiArticleDTO;
 import fr.parisnanterre.iqplay.wikigame.dto.create.fiche.FicheRequestDTO;
 import fr.parisnanterre.iqplay.wikigame.dto.create.fiche.WikiQuestionRequestDTO;
 import fr.parisnanterre.iqplay.wikigame.dto.create.fiche.ReponseRequestDTO;
 import fr.parisnanterre.iqplay.wikigame.entity.*;
 import fr.parisnanterre.iqplay.wikigame.repository.FicheRepository;
-import org.jetbrains.annotations.NotNull;
+import fr.parisnanterre.iqplay.wikigame.service.WikiArticleService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,15 +17,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/fiche")
+@RequestMapping("/api/fiche")
 public class FicheController {
 
-    private final FicheRepository ficheRepository;
+    @Autowired
+    private WikiArticleService wikiArticleService;
 
-    public FicheController(FicheRepository ficheRepository) {
-        this.ficheRepository = ficheRepository;
+    @Autowired
+    private FicheRepository ficheRepository;
+
+    /**
+     * Étape 1 : Charger les données d'un WikiDocument à partir de son URL
+     */
+    @GetMapping("/load-wiki")
+    public ResponseEntity<WikiDocument> loadWikiDocument(@RequestParam String url) {
+        try {
+            ResponseEntity<WikiArticleDTO> response = wikiArticleService.getArticleByUrl(url);
+
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                WikiArticleDTO wikiArticleDTO = response.getBody();
+                WikiDocument wikiDocument = new WikiDocument();
+                wikiDocument.setUrl(url);
+                wikiDocument.setWikiId(wikiArticleDTO.getWikiId());
+                wikiDocument.setTitle(wikiArticleDTO.getTitle());
+                wikiDocument.setContent(wikiArticleDTO.getContent());
+                return ResponseEntity.ok(wikiDocument);
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
+    /**
+     * Étape 2 : Créer une fiche en utilisant uniquement l'URL du WikiDocument
+     */
     @Transactional
     @PostMapping("/create")
     public ResponseEntity<Fiche> create(@RequestBody FicheRequestDTO ficheRequestDTO) {
@@ -36,7 +65,6 @@ public class FicheController {
             List<WikiQuestion> wikiQuestions = new ArrayList<>();
             for (WikiQuestionRequestDTO wikiQuestionDTO : ficheRequestDTO.getWikiQuestions()) {
                 WikiQuestion wikiQuestion = getWikiQuestion(wikiQuestionDTO);
-
                 wikiQuestions.add(wikiQuestion);
             }
 
@@ -49,30 +77,32 @@ public class FicheController {
         }
     }
 
-    @NotNull
-    private static WikiQuestion getWikiQuestion(WikiQuestionRequestDTO wikiQuestionDTO) {
+    private WikiQuestion getWikiQuestion(WikiQuestionRequestDTO wikiQuestionDTO) {
         WikiQuestion wikiQuestion = new WikiQuestion();
-
-        WikiDocument wikiDocument = new WikiDocument();
-        wikiDocument.setUrl(wikiQuestionDTO.getWikiDocument().getUrl());
-
-        /*
-         * @see WikiGeoSearchController
-         */
-        // Ces trois attributs seront récupéré grâce à un appel api wiki dans la route /api/geosearch
-
-//        wikiDocument.setContent(wikiQuestionDTO.getWikiDocument().getContent());
-//        wikiDocument.setTitle(wikiQuestionDTO.getWikiDocument().getTitle());
-//        wikiDocument.setWikiId(wikiQuestionDTO.getWikiDocument().getWikiId());
-
-        Question question = getQuestion(wikiQuestionDTO);
-
+        WikiDocument wikiDocument = fetchWikiDocumentFromUrl(wikiQuestionDTO.getWikiDocument().getUrl());
         wikiQuestion.setWikiDocument(wikiDocument);
-        wikiQuestion.setQuestion(question);
+        wikiQuestion.setQuestion(getQuestion(wikiQuestionDTO));
         return wikiQuestion;
     }
 
-    @NotNull
+    private WikiDocument fetchWikiDocumentFromUrl(String url) {
+        try {
+            ResponseEntity<WikiArticleDTO> response = wikiArticleService.getArticleByUrl(url);
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                WikiArticleDTO wikiArticleDTO = response.getBody();
+                WikiDocument wikiDocument = new WikiDocument();
+                wikiDocument.setUrl(url);
+                wikiDocument.setWikiId(wikiArticleDTO.getWikiId());
+                wikiDocument.setTitle(wikiArticleDTO.getTitle());
+                wikiDocument.setContent(wikiArticleDTO.getContent());
+                return wikiDocument;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private static Question getQuestion(WikiQuestionRequestDTO wikiQuestionDTO) {
         Question question = new Question();
         question.setIntitule(wikiQuestionDTO.getQuestion().getIntitule());

@@ -1,5 +1,4 @@
-package fr.parisnanterre.iqplay.wikigame.controller;
-
+package fr.parisnanterre.iqplay.wikigame.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,24 +9,20 @@ import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-@RestController
-@RequestMapping("/api")
-public class WikiArticleController {
+@Service
+public class WikiArticleService {
 
     @Autowired
     private RestTemplate restTemplate;
 
-    @GetMapping("/wiki")
     public ResponseEntity<WikiArticleDTO> getArticleByUrl(@RequestParam String url) {
         try {
             String title = extractTitleFromUrl(url);
@@ -57,7 +52,7 @@ public class WikiArticleController {
             String content = contentRoot.path("query").path("pages").path(pageId).path("extract").asText();
 
             String cleanText = cleanWikipediaText(content);
-            return ResponseEntity.ok(new WikiArticleDTO(wikiId, url, title, cleanText));
+            return ResponseEntity.ok(new WikiArticleDTO(String.valueOf(wikiId), url, title, cleanText));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -88,5 +83,5 @@ public class WikiArticleController {
 
         return doc.body().text().replaceAll("\\[\\d+\\]", "").replaceAll("\\s+", " ");
     }
-}
 
+}

@@ -1,0 +1,15 @@
+meta {
+  name: test fetch wikidocument by url
+  type: http
+  seq: 6
+}
+
+get {
+  url: https://localhost:8443/api/fiche/load-wiki?url=https://fr.wikipedia.org/wiki/Tour_Eiffel
+  body: none
+  auth: inherit
+}
+
+params:query {
+  url: https://fr.wikipedia.org/wiki/Tour_Eiffel
+}
