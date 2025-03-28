@@ -1,0 +1,92 @@
+meta {
+  name: create fiche with multiple wikidocument
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://localhost:8443/api/fiche/create
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": "fiche1",
+    "titre": "Fiche sur l'Histoire",
+    "badge": "Histoire",
+    "description": "Une fiche contenant des questions sur l'Histoire.",
+    "wikiQuestions": [
+      {
+        "question": {
+          "intitule": "Qui a découvert l'Amérique ?",
+          "generatedByAi": false,
+          "reponses": [
+            {
+              "reponse": "Christophe Colomb",
+              "correct": true
+            },
+            {
+              "reponse": "Marco Polo",
+              "correct": false
+            },
+            {
+              "reponse": "Vasco de Gama",
+              "correct": false
+            }
+          ]
+        },
+        "wikiDocument": {
+          "url": "https://fr.wikipedia.org/wiki/Christophe_Colomb"
+        }
+      },
+      {
+        "question": {
+          "intitule": "Quel est le premier président des États-Unis ?",
+          "generatedByAi": false,
+          "reponses": [
+            {
+              "reponse": "George Washington",
+              "correct": true
+            },
+            {
+              "reponse": "Abraham Lincoln",
+              "correct": false
+            },
+            {
+              "reponse": "Thomas Jefferson",
+              "correct": false
+            }
+          ]
+        },
+        "wikiDocument": {
+          "url": "https://fr.wikipedia.org/wiki/George_Washington"
+        }
+      },
+      {
+        "question": {
+          "intitule": "En quelle année a eu lieu la Révolution française ?",
+          "generatedByAi": false,
+          "reponses": [
+            {
+              "reponse": "1789",
+              "correct": true
+            },
+            {
+              "reponse": "1799",
+              "correct": false
+            },
+            {
+              "reponse": "1804",
+              "correct": false
+            }
+          ]
+        },
+        "wikiDocument": {
+          "url": "https://fr.wikipedia.org/wiki/Notre-Dame_de_Paris"
+        }
+      }
+    ]
+  }
+  
+}

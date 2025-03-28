@@ -72,12 +72,14 @@ public class FicheController {
             fiche.setDescription(ficheRequestDTO.getDescription());
 
             List<WikiQuestion> wikiQuestions = new ArrayList<>();
+
             for (WikiQuestionRequestDTO wikiQuestionDTO : ficheRequestDTO.getWikiQuestions()) {
                 WikiQuestion wikiQuestion = getWikiQuestion(wikiQuestionDTO);
                 wikiQuestions.add(wikiQuestion);
             }
 
             fiche.setWikiQuestions(wikiQuestions);
+
             ficheRepository.save(fiche);
             return new ResponseEntity<>(fiche, HttpStatus.CREATED);
         } catch (Exception e) {
@@ -88,21 +90,26 @@ public class FicheController {
 
     private WikiQuestion getWikiQuestion(WikiQuestionRequestDTO wikiQuestionDTO) {
         WikiQuestion wikiQuestion = new WikiQuestion();
-        WikiDocument wikiDocument = fetchWikiDocumentFromUrl(wikiQuestionDTO.getWikiDocument().getUrl());
-        wikiQuestion.setWikiDocument(wikiDocument);
 
+        // Récupérer le WikiDocument via l'URL fournie
+        WikiDocument wikiDocument = fetchWikiDocumentFromUrl(wikiQuestionDTO.getWikiDocument().getUrl());
+        if (wikiDocument != null) {
+            wikiQuestion.setWikiDocument(wikiDocument);
+        } else {
+            throw new IllegalArgumentException("WikiDocument introuvable pour l'URL fournie.");
+        }
+
+        // Si la question est générée par l'IA, traiter la génération des réponses
         if (wikiQuestionDTO.getQuestion().isGeneratedByAi()) {
-            // Si generatedByAi est vrai, l'IA génère la question et les réponses
             try {
                 String content = wikiDocument.getContent();
                 String qcmJson = aimlApiService.generateQcm(content);
-                // Traiter la réponse de l'IA pour en extraire la question et les réponses
                 processAiQcmResponse(wikiQuestion, qcmJson);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else {
-            wikiQuestion.setQuestion(getQuestion(wikiQuestionDTO));
+            wikiQuestion.setQuestion(getQuestion(wikiQuestionDTO));  // Sinon, on récupère la question fournie par l'utilisateur
         }
 
         return wikiQuestion;
@@ -161,7 +168,7 @@ public class FicheController {
 
         String content = wikiArticleDTO.getContent();
         if (content != null && content.length() > 70) {
-            content = content.substring(0, 70);  // On garde seulement les 70 premiers caractères
+            content = content.substring(0, 70);  // On garde seulement les 70 premiers caractères pour eviter les erreurs de limite mysql
         }
         wikiDocument.setContent(content);
         return wikiDocument;
@@ -183,4 +190,6 @@ public class FicheController {
         question.setReponses(reponses);
         return question;
     }
+
+
 }

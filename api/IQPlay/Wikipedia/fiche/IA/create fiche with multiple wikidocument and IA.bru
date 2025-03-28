@@ -1,7 +1,7 @@
 meta {
-  name: create fiche with ai
+  name: create fiche with multiple wikidocument and IA
   type: http
-  seq: 4
+  seq: 2
 }
 
 post {
@@ -19,6 +19,22 @@ body:json {
       {
         "wikiDocument": {
           "url": "https://fr.wikipedia.org/wiki/Tour_Eiffel"
+        },
+        "question": {
+          "generatedByAi": true
+        }
+      },
+      {
+        "wikiDocument": {
+          "url": "https://fr.wikipedia.org/wiki/Louvre"
+        },
+        "question": {
+          "generatedByAi": true
+        }
+      },
+      {
+        "wikiDocument": {
+          "url": "https://fr.wikipedia.org/wiki/Notre-Dame_de_Paris"
         },
         "question": {
           "generatedByAi": true
