@@ -1,0 +1,30 @@
+meta {
+  name: create fiche with ai
+  type: http
+  seq: 4
+}
+
+post {
+  url: https://localhost:8443/api/fiche/create
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "badge": "Historique",
+    "titre": "Le château de Chambord",
+    "description": "Un QCM basé sur l'histoire du château de Chambord.",
+    "wikiQuestions": [
+      {
+        "wikiDocument": {
+          "url": "https://fr.wikipedia.org/wiki/Tour_Eiffel"
+        },
+        "question": {
+          "generatedByAi": true
+        }
+      }
+    ]
+  }
+  
+}

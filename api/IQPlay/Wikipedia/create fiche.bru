@@ -1,7 +1,7 @@
 meta {
-  name: test create fiche
+  name: create fiche
   type: http
-  seq: 4
+  seq: 1
 }
 
 post {
@@ -12,9 +12,9 @@ post {
 
 body:json {
   {
-    "titre": "Les châteaux de la Loire",
-    "badge": "expert",
-    "description": "Un quiz sur les châteaux emblématiques de la vallée de la Loire.",
+    "badge": "Historique",
+    "titre": "Le château de Chambord",
+    "description": "Un QCM basé sur l'histoire du château de Chambord.",
     "wikiQuestions": [
       {
         "wikiDocument": {
@@ -29,15 +29,15 @@ body:json {
               "correct": true
             },
             {
-              "reponse": "1624",
+              "reponse": "1550",
               "correct": false
             },
             {
-              "reponse": "1440",
+              "reponse": "1600",
               "correct": false
             },
             {
-              "reponse": "1789",
+              "reponse": "1485",
               "correct": false
             }
           ]
@@ -45,4 +45,5 @@ body:json {
       }
     ]
   }
+  
 }

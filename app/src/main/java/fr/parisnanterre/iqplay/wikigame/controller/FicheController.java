@@ -6,14 +6,19 @@ import fr.parisnanterre.iqplay.wikigame.dto.create.fiche.WikiQuestionRequestDTO;
 import fr.parisnanterre.iqplay.wikigame.dto.create.fiche.ReponseRequestDTO;
 import fr.parisnanterre.iqplay.wikigame.entity.*;
 import fr.parisnanterre.iqplay.wikigame.repository.FicheRepository;
+import fr.parisnanterre.iqplay.wikigame.service.AimlApiService;
 import fr.parisnanterre.iqplay.wikigame.service.WikiArticleService;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +31,9 @@ public class FicheController {
 
     @Autowired
     private FicheRepository ficheRepository;
+
+    @Autowired
+    private AimlApiService aimlApiService;
 
     /**
      * Étape 1 : Charger les données d'un WikiDocument à partir de son URL
@@ -82,17 +90,59 @@ public class FicheController {
         WikiQuestion wikiQuestion = new WikiQuestion();
         WikiDocument wikiDocument = fetchWikiDocumentFromUrl(wikiQuestionDTO.getWikiDocument().getUrl());
         wikiQuestion.setWikiDocument(wikiDocument);
-        wikiQuestion.setQuestion(getQuestion(wikiQuestionDTO));
+
+        if (wikiQuestionDTO.getQuestion().isGeneratedByAi()) {
+            // Si generatedByAi est vrai, l'IA génère la question et les réponses
+            try {
+                String content = wikiDocument.getContent();
+                String qcmJson = aimlApiService.generateQcm(content);
+                // Traiter la réponse de l'IA pour en extraire la question et les réponses
+                processAiQcmResponse(wikiQuestion, qcmJson);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            wikiQuestion.setQuestion(getQuestion(wikiQuestionDTO));
+        }
+
         return wikiQuestion;
     }
+
+    private void processAiQcmResponse(WikiQuestion wikiQuestion, String qcmJson) {
+        try {
+            JSONObject jsonResponse = new JSONObject(qcmJson);
+            JSONArray qcmArray = jsonResponse.getJSONArray("qcm");
+            JSONObject qcm = qcmArray.getJSONObject(0);
+            String questionText = qcm.getString("question");
+            wikiQuestion.setQuestion(new Question(questionText, true));
+
+            // Initialisation de la liste des réponses si elle est null. Important car sinon on a un NullPointerException
+            if (wikiQuestion.getQuestion().getReponses() == null) {
+                wikiQuestion.getQuestion().setReponses(new ArrayList<>());
+            }
+
+            // Ajout des réponses à la question générée par l'IA
+            JSONArray responses = qcm.getJSONArray("reponses");
+            for (int i = 0; i < responses.length(); i++) {
+                JSONObject responseJson = responses.getJSONObject(i);
+                Reponse response = new Reponse();
+                response.setReponse(responseJson.getString("reponse"));
+                response.setCorrect(responseJson.getBoolean("correct"));
+                response.setQuestion(wikiQuestion.getQuestion());
+                wikiQuestion.getQuestion().getReponses().add(response);
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private WikiDocument fetchWikiDocumentFromUrl(String url) {
         try {
             ResponseEntity<WikiArticleDTO> response = wikiArticleService.getArticleByUrl(url);
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 WikiDocument wikiDocument = getWikiDocument(url, response);
-
-                System.out.println("Content : " + wikiDocument.getContent());
                 return wikiDocument;
             }
         } catch (Exception e) {
@@ -116,7 +166,6 @@ public class FicheController {
         wikiDocument.setContent(content);
         return wikiDocument;
     }
-
 
     private static Question getQuestion(WikiQuestionRequestDTO wikiQuestionDTO) {
         Question question = new Question();

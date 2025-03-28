@@ -4,6 +4,7 @@ import fr.parisnanterre.iqplay.wikigame.entity.api.IQuestion;
 import jakarta.persistence.*;
 import org.hibernate.type.NumericBooleanConverter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -17,6 +18,15 @@ public class Question implements IQuestion {
     private boolean isGeneratedByAi;
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reponse> reponses;
+
+    public Question(String intitule, boolean isGeneratedByAi) {
+        this.intitule = intitule;
+        this.isGeneratedByAi = isGeneratedByAi;
+    }
+
+    public Question() {
+        this.reponses = new ArrayList<>();
+    }
 
     public Long getId() {
         return id;
