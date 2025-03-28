@@ -1,5 +1,6 @@
 package fr.parisnanterre.iqplay.wikigame.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import fr.parisnanterre.iqplay.wikigame.entity.api.IWikiQuestion;
 import jakarta.persistence.*;
 
@@ -15,6 +16,11 @@ public class WikiQuestion implements IWikiQuestion {
 
     @OneToOne(cascade = CascadeType.ALL)
     private WikiDocument wikiDocument;
+
+    @ManyToOne
+    @JoinColumn(name = "fiche_id")
+    @JsonBackReference
+    private Fiche fiche;
 
     @Override
     public Long getId() {

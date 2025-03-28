@@ -2,6 +2,7 @@ package fr.parisnanterre.iqplay.wikigame.dto.create.fiche;
 
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 
 public class ReponseRequestDTO {
 
@@ -9,7 +10,7 @@ public class ReponseRequestDTO {
     private String id;
     @NotBlank(message = "La réponse ne peut pas être vide")
     private String reponse;
-    @NotBlank(message = "isCorrect ne peut pas être vide")
+    @NotEmpty
     private boolean isCorrect;
 
     public String getId() {

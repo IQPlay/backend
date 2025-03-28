@@ -1,0 +1,50 @@
+meta {
+  name: test create fiche
+  type: http
+  seq: 4
+}
+
+post {
+  url: https://localhost:8443/fiche/create
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "titre": "Les châteaux de la Loire",
+    "badge": "expert",
+    "description": "Un quiz sur les châteaux emblématiques de la vallée de la Loire.",
+    "wikiQuestions": [
+      {
+        "wikiDocument": {
+          "url": "https://fr.wikipedia.org/wiki/Château_de_Chambord",
+          "content": "Le château de Chambord est un chef-d'œuvre de la Renaissance française...",
+          "title": "Château de Chambord"
+        },
+        "question": {
+          "intitule": "En quelle année a commencé la construction du château de Chambord ?",
+          "generatedByAi": false,
+          "reponses": [
+            {
+              "reponse": "1519",
+              "correct": true
+            },
+            {
+              "reponse": "1624",
+              "correct": false
+            },
+            {
+              "reponse": "1440",
+              "correct": false
+            },
+            {
+              "reponse": "1789",
+              "correct": false
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

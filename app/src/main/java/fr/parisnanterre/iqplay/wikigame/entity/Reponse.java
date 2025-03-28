@@ -1,10 +1,8 @@
 package fr.parisnanterre.iqplay.wikigame.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import fr.parisnanterre.iqplay.wikigame.entity.api.IReponse;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Reponse implements IReponse {
@@ -14,6 +12,11 @@ public class Reponse implements IReponse {
     private Long id;
     private String reponse;
     private boolean isCorrect;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "question_id", nullable = false)
+    @JsonIgnore // Empêche la récursion JSON
+    private Question question;
 
     @Override
     public Long getId() {
@@ -40,10 +43,18 @@ public class Reponse implements IReponse {
         isCorrect = correct;
     }
 
+    public Question getQuestion() {
+        return question;
+    }
+
+    public void setQuestion(Question question) {
+        this.question = question;
+    }
+
     @Override
     public String toString() {
         return "Reponse{" +
-                "id='" + id + '\'' +
+                "id=" + id + // correction ici pour ne pas avoir des guillemets autour
                 ", reponse='" + reponse + '\'' +
                 ", isCorrect=" + isCorrect +
                 '}';

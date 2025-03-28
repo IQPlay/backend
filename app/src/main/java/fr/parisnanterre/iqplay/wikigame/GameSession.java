@@ -1,7 +1,5 @@
 package fr.parisnanterre.iqplay.wikigame;
 
-import fr.parisnanterre.iqplay.model.Level;
-import fr.parisnanterre.iqplay.model.Score;
 import fr.parisnanterre.iqplay.wikigame.service.WikiOperationService;
 import fr.parisnanterre.iqplaylib.api.*;
 import fr.parisnanterre.iqplaylib.core.AbstractGameSession;
@@ -19,8 +17,6 @@ public class GameSession extends AbstractGameSession {
     @Override
     public void start(ILevel level, IScore score) {
         this.state = StateGameSessionEnum.IN_PROGRESS;
-        this.level = new Level(level.level());
-        this.score = new Score(score.score());
     }
 
 

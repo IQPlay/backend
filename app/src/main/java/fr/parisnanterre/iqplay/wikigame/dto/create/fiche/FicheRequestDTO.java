@@ -2,6 +2,7 @@ package fr.parisnanterre.iqplay.wikigame.dto.create.fiche;
 
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
 
@@ -15,8 +16,8 @@ public class FicheRequestDTO {
     private String badge;
     @NotBlank(message = "La description de la fiche est obligatoire")
     private String description;
-    @NotBlank(message = "Les questions de la fiche sont obligatoires")
-    private List<WikiQuestionRequestDTO> wikiQuestion;
+    @NotEmpty
+    private List<WikiQuestionRequestDTO> wikiQuestions;
 
     public String getId() {
         return id;
@@ -40,10 +41,10 @@ public class FicheRequestDTO {
         this.description = description;
     }
     public List<WikiQuestionRequestDTO> getWikiQuestions() {
-        return wikiQuestion;
+        return wikiQuestions;
     }
-    public void setWikiQuestions(List<WikiQuestionRequestDTO> wikiQuestion) {
-        this.wikiQuestion = wikiQuestion;
+    public void setWikiQuestions(List<WikiQuestionRequestDTO> wikiQuestions) {
+        this.wikiQuestions = wikiQuestions;
     }
 
     @Override
@@ -53,7 +54,7 @@ public class FicheRequestDTO {
                 ", titre='" + titre + '\'' +
                 ", badge='" + badge + '\'' +
                 ", description='" + description + '\'' +
-                ", questions=" + wikiQuestion +
+                ", questions=" + wikiQuestions +
                 '}';
     }
 }

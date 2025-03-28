@@ -12,8 +12,7 @@ public class Question implements IQuestion {
     private Long id;
     private String intitule;
     private boolean isGeneratedByAi;
-    @OneToMany
-    @JoinColumn(name = "reponse_id")
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reponse> reponses;
 
     public Long getId() {

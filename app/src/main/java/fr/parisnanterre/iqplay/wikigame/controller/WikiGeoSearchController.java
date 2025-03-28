@@ -71,21 +71,25 @@ public class WikiGeoSearchController {
                     .replaceAll("\\[\\d+\\]", "")
                     .replaceAll("\\s+", " ");
 
-            String qcmJson = aimlApiService.generateQcm(cleanText);
 
-            QcmDTO qcmDto;
-            try {
-                qcmDto = mapper.readValue(qcmJson, QcmDTO.class);
-            } catch (Exception ex) {
-                System.err.println("Erreur de désérialisation du QCM JSON : " + ex.getMessage());
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-            }
-            qcmDto.setContent(cleanText);
-
-            return ResponseEntity.ok(qcmDto);
+            return ResponseEntity.ok(new QcmDTO());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+//    private llmquestion(ObjectMapper mapper, String cleanText) {
+//        String qcmJson = aimlApiService.generateQcm(cleanText);
+//
+//        QcmDTO qcmDto;
+//        try {
+//            qcmDto = mapper.readValue(qcmJson, QcmDTO.class);
+//        } catch (Exception ex) {
+//            System.err.println("Erreur de désérialisation du QCM JSON : " + ex.getMessage());
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+//        }
+//        qcmDto.setContent(cleanText);
+//    return ResponseEntity.ok(qcmDto);
+//    }
 }

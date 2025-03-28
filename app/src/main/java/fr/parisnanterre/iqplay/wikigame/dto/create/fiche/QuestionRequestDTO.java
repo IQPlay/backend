@@ -2,6 +2,8 @@ package fr.parisnanterre.iqplay.wikigame.dto.create.fiche;
 
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
@@ -10,8 +12,9 @@ public class QuestionRequestDTO {
     private String id;
     @NotBlank(message = "L'intitulé de la question ne peut pas être vide")
     private String intitule;
+    @NotNull
     private boolean isGeneratedByAi;
-    @NotBlank(message = "La liste des réponses ne peut pas être vide")
+    @NotEmpty
     private List<ReponseRequestDTO> reponses;
 
     public String getId() {

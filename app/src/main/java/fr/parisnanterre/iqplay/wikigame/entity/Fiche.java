@@ -1,5 +1,6 @@
 package fr.parisnanterre.iqplay.wikigame.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import fr.parisnanterre.iqplay.wikigame.entity.api.IFiche;
 import jakarta.persistence.*;
 
@@ -14,7 +15,8 @@ public class Fiche implements IFiche {
     private String titre;
     private String badge;
     private String description;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "fiche", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<WikiQuestion> wikiQuestions;
 
     @Override
