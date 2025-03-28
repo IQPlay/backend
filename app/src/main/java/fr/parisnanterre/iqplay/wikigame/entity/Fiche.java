@@ -14,9 +14,8 @@ public class Fiche implements IFiche {
     private String titre;
     private String badge;
     private String description;
-    @OneToMany
-    @JoinColumn(name = "wiki_question_id")
-    private List<WikiQuestion> wikiQuestion;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WikiQuestion> wikiQuestions;
 
     @Override
     public Long getId() {
@@ -55,12 +54,12 @@ public class Fiche implements IFiche {
 
     @Override
     public List<WikiQuestion> getWikiQuestions() {
-        return wikiQuestion;
+        return wikiQuestions;
     }
 
     @Override
     public void setWikiQuestions(List<WikiQuestion> wikiQuestion) {
-        this.wikiQuestion = wikiQuestion;
+        this.wikiQuestions = wikiQuestion;
     }
 
     @Override
@@ -70,7 +69,7 @@ public class Fiche implements IFiche {
                 ", titre='" + titre + '\'' +
                 ", badge='" + badge + '\'' +
                 ", description='" + description + '\'' +
-                ", questions=" + wikiQuestion +
+                ", questions=" + wikiQuestions +
                 '}';
     }
 }

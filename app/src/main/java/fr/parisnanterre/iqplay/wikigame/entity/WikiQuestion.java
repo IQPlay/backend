@@ -9,11 +9,11 @@ public class WikiQuestion implements IWikiQuestion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne
-    @JoinColumn(name = "question_id")
+
+    @OneToOne(cascade = CascadeType.ALL)
     private Question question;
-    @OneToOne
-    @JoinColumn(name = "wiki_document_id")
+
+    @OneToOne(cascade = CascadeType.ALL)
     private WikiDocument wikiDocument;
 
     @Override
