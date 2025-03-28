@@ -1,7 +1,7 @@
-package fr.parisnanterre.iqplay.wikigame.model.api;
+package fr.parisnanterre.iqplay.wikigame.entity.api;
 
-import fr.parisnanterre.iqplay.wikigame.model.Question;
-import fr.parisnanterre.iqplay.wikigame.model.WikiDocument;
+import fr.parisnanterre.iqplay.wikigame.entity.Question;
+import fr.parisnanterre.iqplay.wikigame.entity.WikiDocument;
 
 public interface IWikiQuestion {
      String getId();

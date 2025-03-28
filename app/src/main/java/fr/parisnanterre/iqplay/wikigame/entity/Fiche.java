@@ -1,6 +1,6 @@
-package fr.parisnanterre.iqplay.wikigame.model;
+package fr.parisnanterre.iqplay.wikigame.entity;
 
-import fr.parisnanterre.iqplay.wikigame.model.api.IFiche;
+import fr.parisnanterre.iqplay.wikigame.entity.api.IFiche;
 import jakarta.persistence.*;
 
 import java.util.List;

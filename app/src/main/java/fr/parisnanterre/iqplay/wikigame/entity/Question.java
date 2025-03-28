@@ -1,11 +1,10 @@
-package fr.parisnanterre.iqplay.wikigame.model;
+package fr.parisnanterre.iqplay.wikigame.entity;
 
-import fr.parisnanterre.iqplay.wikigame.model.api.IQuestion;
+import fr.parisnanterre.iqplay.wikigame.entity.api.IQuestion;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 

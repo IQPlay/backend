@@ -1,6 +1,6 @@
-package fr.parisnanterre.iqplay.wikigame.model.api;
+package fr.parisnanterre.iqplay.wikigame.entity.api;
 
-import fr.parisnanterre.iqplay.wikigame.model.Reponse;
+import fr.parisnanterre.iqplay.wikigame.entity.Reponse;
 
 import java.util.List;
 

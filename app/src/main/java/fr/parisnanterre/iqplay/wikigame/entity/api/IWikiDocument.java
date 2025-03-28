@@ -1,4 +1,4 @@
-package fr.parisnanterre.iqplay.wikigame.model.api;
+package fr.parisnanterre.iqplay.wikigame.entity.api;
 
 public interface IWikiDocument {
     Long getId();

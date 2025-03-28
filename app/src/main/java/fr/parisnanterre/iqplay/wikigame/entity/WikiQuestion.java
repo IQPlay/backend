@@ -1,11 +1,7 @@
-package fr.parisnanterre.iqplay.wikigame.model;
+package fr.parisnanterre.iqplay.wikigame.entity;
 
-import fr.parisnanterre.iqplay.wikigame.model.api.IWikiDocument;
-import fr.parisnanterre.iqplay.wikigame.model.api.IWikiQuestion;
-import fr.parisnanterre.iqplaylib.api.IQuestion;
+import fr.parisnanterre.iqplay.wikigame.entity.api.IWikiQuestion;
 import jakarta.persistence.*;
-
-import java.util.List;
 
 @Entity
 public class WikiQuestion implements IWikiQuestion {
