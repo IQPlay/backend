@@ -79,17 +79,4 @@ public class WikiGeoSearchController {
         }
     }
 
-//    private llmquestion(ObjectMapper mapper, String cleanText) {
-//        String qcmJson = aimlApiService.generateQcm(cleanText);
-//
-//        QcmDTO qcmDto;
-//        try {
-//            qcmDto = mapper.readValue(qcmJson, QcmDTO.class);
-//        } catch (Exception ex) {
-//            System.err.println("Erreur de désérialisation du QCM JSON : " + ex.getMessage());
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-//        }
-//        qcmDto.setContent(cleanText);
-//    return ResponseEntity.ok(qcmDto);
-//    }
 }

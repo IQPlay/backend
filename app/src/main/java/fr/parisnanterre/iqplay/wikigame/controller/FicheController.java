@@ -2,9 +2,9 @@ package fr.parisnanterre.iqplay.wikigame.controller;
 
 import fr.parisnanterre.iqplay.service.PlayerService;
 import fr.parisnanterre.iqplay.wikigame.dto.WikiArticleDTO;
-import fr.parisnanterre.iqplay.wikigame.dto.create.fiche.FicheRequestDTO;
-import fr.parisnanterre.iqplay.wikigame.dto.create.fiche.WikiQuestionRequestDTO;
-import fr.parisnanterre.iqplay.wikigame.dto.create.fiche.ReponseRequestDTO;
+import fr.parisnanterre.iqplay.wikigame.dto.fiche.create.FicheRequestDTO;
+import fr.parisnanterre.iqplay.wikigame.dto.fiche.create.WikiQuestionRequestDTO;
+import fr.parisnanterre.iqplay.wikigame.dto.fiche.create.ReponseRequestDTO;
 import fr.parisnanterre.iqplay.wikigame.entity.*;
 import fr.parisnanterre.iqplay.wikigame.repository.FicheRepository;
 import fr.parisnanterre.iqplay.wikigame.service.AimlApiService;

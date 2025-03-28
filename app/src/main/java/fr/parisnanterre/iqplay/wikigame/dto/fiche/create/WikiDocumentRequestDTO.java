@@ -1,6 +1,5 @@
-package fr.parisnanterre.iqplay.wikigame.dto.create.fiche;
+package fr.parisnanterre.iqplay.wikigame.dto.fiche.create;
 
-import fr.parisnanterre.iqplay.wikigame.entity.api.IWikiDocument;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 
