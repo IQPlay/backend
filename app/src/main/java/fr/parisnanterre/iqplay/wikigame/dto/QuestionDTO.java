@@ -1,4 +1,4 @@
-package fr.parisnanterre.iqplay.dto.qcm;
+package fr.parisnanterre.iqplay.wikigame.dto;
 
 import java.util.List;
 

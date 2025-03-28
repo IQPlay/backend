@@ -1,4 +1,4 @@
-package fr.parisnanterre.iqplay.service;
+package fr.parisnanterre.iqplay.wikigame;
 
 import okhttp3.*;
 import org.json.JSONArray;
