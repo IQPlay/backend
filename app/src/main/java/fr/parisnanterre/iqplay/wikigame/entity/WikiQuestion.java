@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 public class WikiQuestion implements IWikiQuestion {
 
     @Id
-    private String id;
+    private Long id;
     @OneToOne
     @JoinColumn(name = "question_id")
     private Question question;
@@ -16,7 +16,7 @@ public class WikiQuestion implements IWikiQuestion {
     private WikiDocument wikiDocument;
 
     @Override
-    public String getId() {
+    public Long getId() {
         return id;
     }
 

@@ -5,7 +5,7 @@ import fr.parisnanterre.iqplay.wikigame.entity.WikiQuestion;
 import java.util.List;
 
 public interface IFiche {
-     String getId();
+     Long getId();
      String getTitre();
      void setTitre(String titre);
      String getBadge();

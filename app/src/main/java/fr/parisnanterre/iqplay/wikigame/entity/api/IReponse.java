@@ -1,8 +1,7 @@
 package fr.parisnanterre.iqplay.wikigame.entity.api;
 
 public interface IReponse {
-     String getId();
-     void setId(String id);
+     Long getId();
      String getReponse();
      void setReponse(String reponse);
      boolean isCorrect();

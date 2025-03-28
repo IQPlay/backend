@@ -11,14 +11,14 @@ import java.util.List;
 @Entity
 public class Question implements IQuestion {
     @Id
-    private String id;
+    private Long id;
     private String intitule;
     private boolean isGeneratedByAi;
     @OneToMany
     @JoinColumn(name = "reponse_id")
     private List<Reponse> reponses;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 

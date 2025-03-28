@@ -8,18 +8,13 @@ import jakarta.persistence.Id;
 public class Reponse implements IReponse {
 
     @Id
-    private String id;
+    private Long id;
     private String reponse;
     private boolean isCorrect;
 
     @Override
-    public String getId() {
+    public Long getId() {
         return id;
-    }
-
-    @Override
-    public void setId(String id) {
-        this.id = id;
     }
 
     @Override

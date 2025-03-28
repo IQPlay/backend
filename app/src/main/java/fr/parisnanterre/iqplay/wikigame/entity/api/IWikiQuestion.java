@@ -4,7 +4,7 @@ import fr.parisnanterre.iqplay.wikigame.entity.Question;
 import fr.parisnanterre.iqplay.wikigame.entity.WikiDocument;
 
 public interface IWikiQuestion {
-     String getId();
+     Long getId();
      Question getQuestion();
      void setQuestion(Question question);
      WikiDocument getWikiDocument();

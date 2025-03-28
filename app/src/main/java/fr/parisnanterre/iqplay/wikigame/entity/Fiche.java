@@ -9,7 +9,7 @@ import java.util.List;
 public class Fiche implements IFiche {
 
     @Id
-    private String id;
+    private Long id;
     private String titre;
     private String badge;
     private String description;
@@ -18,7 +18,7 @@ public class Fiche implements IFiche {
     private List<WikiQuestion> wikiQuestion;
 
     @Override
-    public String getId() {
+    public Long getId() {
         return id;
     }
 

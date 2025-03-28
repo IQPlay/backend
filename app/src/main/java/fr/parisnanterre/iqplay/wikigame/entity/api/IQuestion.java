@@ -5,7 +5,7 @@ import fr.parisnanterre.iqplay.wikigame.entity.Reponse;
 import java.util.List;
 
 public interface IQuestion {
-     String getId();
+     Long getId();
      String getIntitule();
      void setIntitule(String intitule);
      boolean isGeneratedByAi();
