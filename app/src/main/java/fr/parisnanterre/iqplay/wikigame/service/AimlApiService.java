@@ -1,4 +1,4 @@
-package fr.parisnanterre.iqplay.wikigame;
+package fr.parisnanterre.iqplay.wikigame.service;
 
 import okhttp3.*;
 import org.json.JSONArray;
@@ -48,7 +48,6 @@ public class AimlApiService {
      */
     public String generateQcm(String content) throws IOException, JSONException {
         System.out.println("api key : " + this.apiKey);
-        // Préparez un prompt détaillé pour obtenir la structure souhaitée
         String prompt = "Génère une seule question pertinente sous forme de QCM basée sur le texte suivant :\n" +
                 "{\n" +
                 "  \"content\": \"" + content + "\",\n" +

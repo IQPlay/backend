@@ -2,7 +2,7 @@ package fr.parisnanterre.iqplay.wikigame.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.parisnanterre.iqplay.wikigame.dto.QcmDTO;
-import fr.parisnanterre.iqplay.wikigame.AimlApiService;
+import fr.parisnanterre.iqplay.wikigame.service.AimlApiService;
 import info.bliki.wiki.model.WikiModel;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
