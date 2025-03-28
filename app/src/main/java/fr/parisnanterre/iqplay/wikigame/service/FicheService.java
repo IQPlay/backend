@@ -2,21 +2,33 @@ package fr.parisnanterre.iqplay.wikigame.service;
 
 import fr.parisnanterre.iqplay.wikigame.GeoCoordinates;
 import fr.parisnanterre.iqplay.wikigame.entity.Fiche;
+import fr.parisnanterre.iqplay.wikigame.entity.FicheProgress;
 import fr.parisnanterre.iqplay.wikigame.entity.WikiDocument;
+import fr.parisnanterre.iqplay.wikigame.repository.FicheProgressRepository;
 import fr.parisnanterre.iqplay.wikigame.repository.FicheRepository;
+import fr.parisnanterre.iqplaylib.api.IPlayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FicheService {
     @Autowired
-    private FicheRepository ficheRepository;
+    private final FicheRepository ficheRepository;
+
+    @Autowired
+    private final FicheProgressRepository ficheProgressRepository;
 
     @Autowired
     private WikiGeoService wikiGeoService;
+
+    public FicheService(FicheRepository ficheRepository, FicheProgressRepository ficheProgressRepository) {
+        this.ficheRepository = ficheRepository;
+        this.ficheProgressRepository = ficheProgressRepository;
+    }
 
     public List<Fiche> getFichesNonEntamees(Long playerId, double lat, double lon) {
 
@@ -72,5 +84,13 @@ public class FicheService {
                 * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c; // Retourne la distance en km
+    }
+
+    public List<Fiche> getFichesEntameesParJoueur(IPlayer player) {
+        List<FicheProgress> ficheProgressList = ficheProgressRepository.findByPlayerId(player.id());
+
+        return ficheProgressList.stream()
+                .map(FicheProgress::getFiche)
+                .collect(Collectors.toList());
     }
 }
