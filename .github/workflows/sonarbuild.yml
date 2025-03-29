@@ -22,6 +22,11 @@ jobs:
           java-version: 17
           distribution: 'zulu'
 
+      - name: Définir les variables d’environnement
+        run: |
+          echo "GITHUB_ACTOR=${{ secrets.GH_PACKAGES_USER }}" >> $GITHUB_ENV
+          echo "GH_PACKAGES_TOKEN=${{ secrets.GH_PACKAGES_TOKEN }}" >> $GITHUB_ENV
+
       - name: Install Graphviz
         run: sudo apt-get update && sudo apt-get install -y graphviz
 
@@ -44,7 +49,5 @@ jobs:
 
       - name: Build and analyze
         env:
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew build sonar --info
