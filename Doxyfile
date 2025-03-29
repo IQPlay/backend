@@ -1,6 +1,6 @@
 # Nom du projet
 PROJECT_NAME           = "IQPlay"
-PROJECT_NUMBER         = "1.1.0"
+PROJECT_NUMBER         = "2.0.0"
 
 # Dossier source à scanner
 INPUT                  = app/src/main/
