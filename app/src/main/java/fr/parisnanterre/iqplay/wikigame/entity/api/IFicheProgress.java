@@ -2,8 +2,10 @@ package fr.parisnanterre.iqplay.wikigame.entity.api;
 
 import fr.parisnanterre.iqplay.entity.Player;
 import fr.parisnanterre.iqplay.wikigame.entity.Fiche;
+import fr.parisnanterre.iqplay.wikigame.entity.QuestionProgress;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface IFicheProgress {
      Fiche getFiche() ;
@@ -16,4 +18,6 @@ public interface IFicheProgress {
      LocalDateTime getDateFin();
      void setDateFin(LocalDateTime dateFin);
      void setFiche(Fiche fiche);
+     List<QuestionProgress> getQuestionProgressList();
+     void setQuestionProgressList(List<QuestionProgress> questionProgressList);
 }

@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import org.hibernate.type.NumericBooleanConverter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class FicheProgress implements IFicheProgress {
@@ -26,6 +28,10 @@ public class FicheProgress implements IFicheProgress {
     private LocalDateTime dateDebut;
 
     private LocalDateTime dateFin;
+
+    @OneToMany(mappedBy = "ficheProgress", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<QuestionProgress> questionProgressList = new ArrayList<>();
+
 
     @Override
     public Fiche getFiche() {
@@ -75,6 +81,16 @@ public class FicheProgress implements IFicheProgress {
     @Override
     public void setFiche(Fiche fiche) {
         this.fiche = fiche;
+    }
+
+    @Override
+    public List<QuestionProgress> getQuestionProgressList() {
+        return questionProgressList;
+    }
+
+    @Override
+    public void setQuestionProgressList(List<QuestionProgress> questionProgressList) {
+        this.questionProgressList = questionProgressList;
     }
 
     @Override
