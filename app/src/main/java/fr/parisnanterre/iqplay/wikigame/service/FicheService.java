@@ -1,5 +1,6 @@
 package fr.parisnanterre.iqplay.wikigame.service;
 
+import fr.parisnanterre.iqplay.entity.Player;
 import fr.parisnanterre.iqplay.wikigame.GeoCoordinates;
 import fr.parisnanterre.iqplay.wikigame.entity.Fiche;
 import fr.parisnanterre.iqplay.wikigame.entity.FicheProgress;
@@ -10,6 +11,7 @@ import fr.parisnanterre.iqplaylib.api.IPlayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -92,5 +94,19 @@ public class FicheService {
         return ficheProgressList.stream()
                 .map(FicheProgress::getFiche)
                 .collect(Collectors.toList());
+    }
+
+    public Fiche getFicheById(Long ficheId) {
+        return ficheRepository.findById(ficheId)
+                .orElse(null);
+    }
+
+    public FicheProgress createFicheProgress(Fiche fiche, Player player) {
+        FicheProgress ficheProgress = new FicheProgress();
+        ficheProgress.setFiche(fiche);
+        ficheProgress.setPlayer(player);
+        ficheProgress.setEstTerminee(false);
+        ficheProgress.setDateDebut(LocalDateTime.now());
+        return ficheProgressRepository.save(ficheProgress);
     }
 }

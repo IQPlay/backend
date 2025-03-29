@@ -3,6 +3,7 @@ package fr.parisnanterre.iqplay.wikigame.entity;
 import fr.parisnanterre.iqplay.entity.Player;
 import fr.parisnanterre.iqplay.wikigame.entity.api.IFicheProgress;
 import jakarta.persistence.*;
+import org.hibernate.type.NumericBooleanConverter;
 
 import java.time.LocalDateTime;
 
@@ -19,6 +20,7 @@ public class FicheProgress implements IFicheProgress {
     @ManyToOne
     private Fiche fiche;
 
+    @Convert(converter = NumericBooleanConverter.class)
     private boolean estTerminee;
 
     private LocalDateTime dateDebut;

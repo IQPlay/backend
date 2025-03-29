@@ -1,5 +1,6 @@
 package fr.parisnanterre.iqplay.wikigame.controller;
 
+import fr.parisnanterre.iqplay.entity.Player;
 import fr.parisnanterre.iqplay.service.PlayerService;
 import fr.parisnanterre.iqplay.wikigame.dto.fiche.fetch.FicheRequestDTO;
 import fr.parisnanterre.iqplay.wikigame.entity.Fiche;
@@ -45,5 +46,22 @@ public class WikiGameController {
         return ResponseEntity.ok(fiches);
     }
 
+    @GetMapping("/wikigame/fiches/{ficheId}")
+    public ResponseEntity<Fiche> getFicheById(@PathVariable Long ficheId) {
+        Fiche fiche = ficheService.getFicheById(ficheId);
+        if (fiche != null) {
+            return ResponseEntity.ok(fiche);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
+    @PostMapping("/wikigame/fiches/{ficheId}/progress")
+    public ResponseEntity<FicheProgress> createFicheProgress(@PathVariable Long ficheId) {
+        Fiche fiche = ficheService.getFicheById(ficheId);
+        IPlayer player = playerService.getCurrentPlayer();
+
+        FicheProgress createdFicheProgress = ficheService.createFicheProgress(fiche, (Player) player);
+        return ResponseEntity.ok(createdFicheProgress);
+    }
 }
