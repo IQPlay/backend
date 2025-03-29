@@ -4,7 +4,7 @@ import fr.parisnanterre.iqplay.entity.Player;
 import fr.parisnanterre.iqplay.service.PlayerService;
 import fr.parisnanterre.iqplay.wikigame.dto.fiche.fetch.FicheRequestDTO;
 import fr.parisnanterre.iqplay.wikigame.entity.*;
-import fr.parisnanterre.iqplay.wikigame.repository.QuestionProgressRepository;
+import fr.parisnanterre.iqplay.wikigame.repository.FicheProgressRepository;
 import fr.parisnanterre.iqplay.wikigame.repository.QuestionRepository;
 import fr.parisnanterre.iqplay.wikigame.service.FicheService;
 import fr.parisnanterre.iqplaylib.api.IPlayer;
@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,9 +33,13 @@ public class WikiGameController {
     @Autowired
     private final QuestionRepository questionRepository;
 
-    public WikiGameController(GameLayerEventService gameLayerEventService, QuestionRepository questionRepository) {
+    @Autowired
+    private final FicheProgressRepository ficheProgressRepository;
+
+    public WikiGameController(GameLayerEventService gameLayerEventService, QuestionRepository questionRepository, FicheProgressRepository ficheProgressRepository) {
         this.gameLayerEventService = gameLayerEventService;
         this.questionRepository = questionRepository;
+        this.ficheProgressRepository = ficheProgressRepository;
     }
 
     @PostMapping("/wikigame")
@@ -166,11 +171,22 @@ public class WikiGameController {
         }
 
         Reponse selectedAnswer = optReponse.get();
-
         boolean isCorrect = selectedAnswer.isCorrect();
 
         if (isCorrect) {
             ficheService.updateQuestionProgress(ficheProgress, questionId, isCorrect);
+
+            int nbQuestionsRepondues = ficheProgress.getQuestionProgressList().size();
+            int nbTotalQuestions = ficheProgress.getFiche().getWikiQuestions().size();
+
+            if (nbQuestionsRepondues == nbTotalQuestions) {
+
+                ficheProgress.setEstTerminee(true);
+                ficheProgress.setDateFin(LocalDateTime.now());
+                ficheProgressRepository.save(ficheProgress);
+                gameLayerEventService.completeEvent("wiki-win-fiche", ficheProgress.getPlayer().id().toString());
+            }
+
             gameLayerEventService.completeEvent("wiki-win-question", ficheProgress.getPlayer().id().toString());
             return ResponseEntity.ok("Bonne réponse");
         } else {
@@ -178,6 +194,7 @@ public class WikiGameController {
             return ResponseEntity.ok("Mauvaise réponse");
         }
     }
+
 
 
 }

@@ -1,6 +1,7 @@
 package fr.parisnanterre.iqplay.wikigame.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.type.NumericBooleanConverter;
 
 @Entity
 public class QuestionProgress {
@@ -17,6 +18,7 @@ public class QuestionProgress {
     @JoinColumn(name = "wiki_question_id", nullable = false)
     private WikiQuestion wikiQuestion;
 
+    @Convert(converter = NumericBooleanConverter.class)
     private boolean isAnsweredCorrectly;
 
     public QuestionProgress() {}
