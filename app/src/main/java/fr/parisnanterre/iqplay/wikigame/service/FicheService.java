@@ -2,11 +2,10 @@ package fr.parisnanterre.iqplay.wikigame.service;
 
 import fr.parisnanterre.iqplay.entity.Player;
 import fr.parisnanterre.iqplay.wikigame.GeoCoordinates;
-import fr.parisnanterre.iqplay.wikigame.entity.Fiche;
-import fr.parisnanterre.iqplay.wikigame.entity.FicheProgress;
-import fr.parisnanterre.iqplay.wikigame.entity.WikiDocument;
+import fr.parisnanterre.iqplay.wikigame.entity.*;
 import fr.parisnanterre.iqplay.wikigame.repository.FicheProgressRepository;
 import fr.parisnanterre.iqplay.wikigame.repository.FicheRepository;
+import fr.parisnanterre.iqplay.wikigame.repository.QuestionProgressRepository;
 import fr.parisnanterre.iqplaylib.api.IPlayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,11 +25,15 @@ public class FicheService {
     private final FicheProgressRepository ficheProgressRepository;
 
     @Autowired
+    private final QuestionProgressRepository questionProgressRepository;
+
+    @Autowired
     private WikiGeoService wikiGeoService;
 
-    public FicheService(FicheRepository ficheRepository, FicheProgressRepository ficheProgressRepository) {
+    public FicheService(FicheRepository ficheRepository, FicheProgressRepository ficheProgressRepository, QuestionProgressRepository questionProgressRepository) {
         this.ficheRepository = ficheRepository;
         this.ficheProgressRepository = ficheProgressRepository;
+        this.questionProgressRepository = questionProgressRepository;
     }
 
     public List<Fiche> getFichesNonEntamees(Long playerId, double lat, double lon) {
@@ -109,4 +113,26 @@ public class FicheService {
         ficheProgress.setDateDebut(LocalDateTime.now());
         return ficheProgressRepository.save(ficheProgress);
     }
+
+    public FicheProgress getFicheProgressForPlayer(Long ficheId, Long playerId) {
+        return ficheProgressRepository.findByFicheIdAndPlayerId(ficheId, playerId);
+    }
+
+    public void updateQuestionProgress(FicheProgress ficheProgress, Long questionId, boolean isCorrect) {
+        Optional<WikiQuestion> wikiQuestionOpt = ficheProgress.getFiche().getWikiQuestions().stream()
+                .filter(q -> q.getId().equals(questionId))
+                .findFirst();
+
+        if (wikiQuestionOpt.isPresent()) {
+            WikiQuestion wikiQuestion = wikiQuestionOpt.get();
+
+            QuestionProgress questionProgress = new QuestionProgress();
+            questionProgress.setFicheProgress(ficheProgress);
+            questionProgress.setWikiQuestion(wikiQuestion);
+            questionProgress.setAnsweredCorrectly(isCorrect);
+
+            questionProgressRepository.save(questionProgress);
+        }
+    }
+
 }

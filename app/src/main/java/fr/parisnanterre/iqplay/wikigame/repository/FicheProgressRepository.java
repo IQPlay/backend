@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface FicheProgressRepository extends JpaRepository<FicheProgress, Long> {
     List<FicheProgress> findByPlayerId(Long playerId);
+
+    FicheProgress findByFicheIdAndPlayerId(Long ficheId, Long playerId);
 }
