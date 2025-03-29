@@ -3,17 +3,15 @@ package fr.parisnanterre.iqplay.wikigame.controller;
 import fr.parisnanterre.iqplay.entity.Player;
 import fr.parisnanterre.iqplay.service.PlayerService;
 import fr.parisnanterre.iqplay.wikigame.dto.fiche.fetch.FicheRequestDTO;
-import fr.parisnanterre.iqplay.wikigame.entity.Fiche;
-import fr.parisnanterre.iqplay.wikigame.entity.FicheProgress;
-import fr.parisnanterre.iqplay.wikigame.entity.Reponse;
-import fr.parisnanterre.iqplay.wikigame.entity.WikiQuestion;
-import fr.parisnanterre.iqplay.wikigame.repository.FicheProgressRepository;
+import fr.parisnanterre.iqplay.wikigame.entity.*;
+import fr.parisnanterre.iqplay.wikigame.repository.QuestionProgressRepository;
+import fr.parisnanterre.iqplay.wikigame.repository.QuestionRepository;
 import fr.parisnanterre.iqplay.wikigame.service.FicheService;
 import fr.parisnanterre.iqplaylib.api.IPlayer;
+import fr.parisnanterre.iqplaylib.gamelayer.GameLayerEventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +25,16 @@ public class WikiGameController {
     private FicheService ficheService;
     @Autowired
     private PlayerService playerService;
+
+    private final GameLayerEventService gameLayerEventService;
+
+    @Autowired
+    private final QuestionRepository questionRepository;
+
+    public WikiGameController(GameLayerEventService gameLayerEventService, QuestionRepository questionRepository) {
+        this.gameLayerEventService = gameLayerEventService;
+        this.questionRepository = questionRepository;
+    }
 
     @PostMapping("/wikigame")
     public ResponseEntity<List<Fiche>> getFichesNonEntamees(@RequestBody FicheRequestDTO ficheRequest) {
@@ -127,18 +135,40 @@ public class WikiGameController {
                 .collect(Collectors.toList()));
     }
 
-//    @PostMapping("/wikigame/fiches/{ficheId}/questions/{questionId}/answer")
-//    public ResponseEntity<String> answerQuestion(@PathVariable Long ficheId,
-//                                                 @PathVariable Long questionId,
-//                                                 @RequestParam boolean isCorrect) {
-//        FicheProgress ficheProgress = ficheProgressRepository.findByFicheIdAndPlayerId(ficheId, playerService.getCurrentPlayer().getId());
-//
-//        if (ficheProgress == null) {
-//            return ResponseEntity.notFound().build(); // Si la fiche n'est pas trouvée
-//        }
-//
-//        ficheService.updateQuestionProgress(ficheProgress, questionId, isCorrect);
-//        return ResponseEntity.ok("Réponse enregistrée");
-//    }
+    /**
+     * Enregistre la réponse du joueur à une question si elle est correcte
+     */
+    @PostMapping("/wikigame/fiches/{ficheId}/questions/{questionId}/answer/{answerId}")
+    public ResponseEntity<String> answerQuestion(@PathVariable Long ficheId,
+                                                 @PathVariable Long questionId,
+                                                 @PathVariable Long answerId) {
+
+        FicheProgress ficheProgress = ficheService.getFicheProgressForPlayer(ficheId, playerService.getCurrentPlayer().id());
+        if (ficheProgress == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Question question = questionRepository.getReferenceById(questionId);
+
+        Optional<Reponse> optReponse = question.getReponses().stream()
+                .filter(r -> r.getId().equals(answerId))
+                .findFirst();
+
+        if (optReponse.isEmpty()) {
+            return ResponseEntity.badRequest().body("Réponse non trouvée");
+        }
+
+        Reponse selectedAnswer = optReponse.get();
+
+        boolean isCorrect = selectedAnswer.isCorrect();
+
+        if (isCorrect) {
+            ficheService.updateQuestionProgress(ficheProgress, questionId, isCorrect);
+            return ResponseEntity.ok("Bonne réponse");
+        } else {
+            return ResponseEntity.ok("Mauvaise réponse");
+        }
+    }
+
 
 }
