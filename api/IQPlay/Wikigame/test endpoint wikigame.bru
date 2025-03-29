@@ -1,0 +1,21 @@
+meta {
+  name: test endpoint wikigame
+  type: http
+  seq: 2
+}
+
+post {
+  url: https://localhost:8443/api/wikigame
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "playerId": 5,
+    "lat": 48.8584,
+    "lon": 2.2945
+  // longitude et latitude de la tour eiffel
+  }
+  
+}

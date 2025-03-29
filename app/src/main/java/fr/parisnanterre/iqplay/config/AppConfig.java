@@ -3,8 +3,11 @@ package fr.parisnanterre.iqplay.config;
 import fr.parisnanterre.iqplay.model.GameCalculMental;
 import fr.parisnanterre.iqplay.service.OperationService;
 
+import fr.parisnanterre.iqplay.wikigame.GameWiki;
+import fr.parisnanterre.iqplay.wikigame.service.WikiOperationService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Configuration class for defining application beans.
@@ -51,5 +54,20 @@ public class AppConfig {
     @Bean
     public GameCalculMental gameCalculMental(OperationService operationService) {
         return new GameCalculMental("Calcul Mental", operationService);
+    }
+
+    @Bean
+    public WikiOperationService wikiOperationService() {
+        return new WikiOperationService();
+    }
+
+    @Bean
+    public GameWiki gameWiki(WikiOperationService wikiOperationService) {
+        return new GameWiki("WikiGame", wikiOperationService);
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }

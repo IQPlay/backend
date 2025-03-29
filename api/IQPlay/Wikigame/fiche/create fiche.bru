@@ -1,0 +1,49 @@
+meta {
+  name: create fiche
+  type: http
+  seq: 2
+}
+
+post {
+  url: https://localhost:8443/api/fiche/create
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "badge": "Historique",
+    "titre": "Le château de Chambord",
+    "description": "Un QCM basé sur l'histoire du château de Chambord.",
+    "wikiQuestions": [
+      {
+        "wikiDocument": {
+          "url": "https://fr.wikipedia.org/wiki/Tour_Eiffel"
+        },
+        "question": {
+          "intitule": "En quelle année a commencé la construction du château de Chambord ?",
+          "generatedByAi": false,
+          "reponses": [
+            {
+              "reponse": "1519",
+              "correct": true
+            },
+            {
+              "reponse": "1550",
+              "correct": false
+            },
+            {
+              "reponse": "1600",
+              "correct": false
+            },
+            {
+              "reponse": "1485",
+              "correct": false
+            }
+          ]
+        }
+      }
+    ]
+  }
+  
+}
