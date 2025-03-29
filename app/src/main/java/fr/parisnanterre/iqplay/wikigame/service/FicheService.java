@@ -132,7 +132,12 @@ public class FicheService {
             questionProgress.setAnsweredCorrectly(isCorrect);
 
             questionProgressRepository.save(questionProgress);
+
+            ficheProgress.getQuestionProgressList().add(questionProgress);
+
+            ficheProgressRepository.save(ficheProgress);
         }
     }
+
 
 }

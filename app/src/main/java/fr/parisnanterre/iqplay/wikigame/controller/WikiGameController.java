@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -141,11 +142,17 @@ public class WikiGameController {
     @PostMapping("/wikigame/fiches/{ficheId}/questions/{questionId}/answer/{answerId}")
     public ResponseEntity<String> answerQuestion(@PathVariable Long ficheId,
                                                  @PathVariable Long questionId,
-                                                 @PathVariable Long answerId) {
+                                                 @PathVariable Long answerId) throws IOException, InterruptedException {
 
         FicheProgress ficheProgress = ficheService.getFicheProgressForPlayer(ficheId, playerService.getCurrentPlayer().id());
         if (ficheProgress == null) {
             return ResponseEntity.notFound().build();
+        }
+
+        boolean dejaRepondu = ficheProgress.getQuestionProgressList().stream()
+                .anyMatch(qp -> qp.getWikiQuestion().getId().equals(questionId));
+        if (dejaRepondu) {
+            return ResponseEntity.badRequest().body("Vous avez déjà répondu à cette question.");
         }
 
         Question question = questionRepository.getReferenceById(questionId);
@@ -164,8 +171,10 @@ public class WikiGameController {
 
         if (isCorrect) {
             ficheService.updateQuestionProgress(ficheProgress, questionId, isCorrect);
+            gameLayerEventService.completeEvent("wiki-win-question", ficheProgress.getPlayer().id().toString());
             return ResponseEntity.ok("Bonne réponse");
         } else {
+            gameLayerEventService.completeEvent("wiki-lose-question", ficheProgress.getPlayer().id().toString());
             return ResponseEntity.ok("Mauvaise réponse");
         }
     }
